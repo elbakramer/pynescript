@@ -1,0 +1,54 @@
+import pyparsing
+
+debug = False
+
+if debug:
+    pyparsing.enable_all_warnings()
+    pyparsing.enable_diag(pyparsing.Diagnostics.enable_debug_on_named_expressions)
+    pyparsing.disable_diag(pyparsing.Diagnostics.warn_name_set_on_empty_Forward)
+
+pyparsing.ParserElement.enable_left_recursion()
+
+from . import common as common_grammars
+from . import expression as expression_grammars
+from . import structure as structure_grammars
+from . import assignment as assignment_grammars
+from . import statement as statement_grammars
+from . import module as module_grammars
+
+common_grammars.expression <<= expression_grammars.expression
+common_grammars.local_statement <<= statement_grammars.local_statement
+
+expression_grammars.attributed_name <<= common_grammars.attributed_name
+expression_grammars.function_call <<= common_grammars.function_call
+
+structure_grammars.expression <<= expression_grammars.expression
+structure_grammars.local_block <<= common_grammars.local_block
+structure_grammars.local_body <<= common_grammars.local_body
+structure_grammars.identifier_declarator <<= common_grammars.identifier_declarator
+structure_grammars.declarator <<= common_grammars.declarator
+
+assignment_grammars.structure <<= structure_grammars.structure
+assignment_grammars.expression <<= expression_grammars.expression
+assignment_grammars.atomic_type_name <<= common_grammars.atomic_type_name
+assignment_grammars.collection_type_name <<= common_grammars.collection_type_name
+assignment_grammars.type_argument <<= common_grammars.type_argument
+assignment_grammars.identifier_declarator <<= common_grammars.identifier_declarator
+assignment_grammars.tuple_declarator <<= common_grammars.tuple_declarator
+assignment_grammars.function_call <<= common_grammars.function_call
+
+statement_grammars.assignment <<= assignment_grammars.assignment
+statement_grammars.structure <<= structure_grammars.structure
+statement_grammars.expression <<= expression_grammars.expression
+statement_grammars.local_body <<= common_grammars.local_body
+
+module_grammars.global_statement <<= statement_grammars.global_statement
+
+pyparsing.autoname_elements()
+
+from .common import *
+from .expression import *
+from .structure import *
+from .assignment import *
+from .statement import *
+from .module import *
