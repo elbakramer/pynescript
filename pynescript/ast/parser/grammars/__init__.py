@@ -5,7 +5,9 @@ debug = False
 if debug:
     pyparsing.enable_all_warnings()
     pyparsing.enable_diag(pyparsing.Diagnostics.enable_debug_on_named_expressions)
-    pyparsing.disable_diag(pyparsing.Diagnostics.warn_name_set_on_empty_Forward)
+    pyparsing.disable_diag(
+        pyparsing.Diagnostics.warn_ungrouped_named_tokens_in_collection
+    )
 
 pyparsing.ParserElement.enable_left_recursion()
 
@@ -30,9 +32,7 @@ structure_grammars.declarator <<= common_grammars.declarator
 
 assignment_grammars.structure <<= structure_grammars.structure
 assignment_grammars.expression <<= expression_grammars.expression
-assignment_grammars.atomic_type_name <<= common_grammars.atomic_type_name
-assignment_grammars.collection_type_name <<= common_grammars.collection_type_name
-assignment_grammars.type_argument <<= common_grammars.type_argument
+assignment_grammars.type_specifier <<= common_grammars.type_specifier
 assignment_grammars.identifier_declarator <<= common_grammars.identifier_declarator
 assignment_grammars.tuple_declarator <<= common_grammars.tuple_declarator
 assignment_grammars.function_call <<= common_grammars.function_call

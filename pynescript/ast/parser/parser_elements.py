@@ -5,14 +5,11 @@ from pyparsing import (
     ParserElement,
     ParseElementEnhance,
     TokenConverter,
-    ParseException,
     ParseResults,
-    ParseAction,
     OneOrMore,
-    FollowedBy,
     Group,
     Empty,
-    Opt,
+    Forward,
     IndentedBlock,
 )
 
@@ -33,28 +30,47 @@ from pynescript.ast.parser.utils import (
 T = TypeVar("T")
 
 
+class ResultNameableForward(Forward):
+    def __init__(self, other: Optional[Union[ParserElement, str]] = None):
+        super().__init__(other)
+        self._copies_should_forward_to = []
+
+    def __lshift__(self, other):
+        super().__lshift__(other)
+        for copy in self._copies_should_forward_to:
+            copy.__lshift__(other)
+        return self
+
+    def _setResultsName(self, name, list_all_matches=False):
+        # pylint: disable=protected-access
+        copy = ParseElementEnhance._setResultsName(self, name, list_all_matches)
+        self._copies_should_forward_to.append(copy)
+        return copy
+
+
 class IndentPeerDetect(Empty):
     def __init__(self, ref_col: int):
         super().__init__()
-        self.errmsg = f"expected indent at column {ref_col}"
-        self.add_condition(lambda s, l, t: calc_width_col(l, s) == ref_col)
+
+        def condition(s, l, t):
+            # pylint: disable=unused-argument
+            cur_col = calc_width_col(l, s)
+            return cur_col == ref_col
+
+        message = f"expected indent at column {ref_col}"
+
+        self.add_condition(condition, message=message)
+
+        self.errmsg = message
+        self.callDuringTry = True
 
 
-class IndentPeerDetectGreater(Empty):
-    def __init__(self, ref_col: int):
-        super().__init__()
-        self.errmsg = f"expected indent at column greater than {ref_col}"
-        self.add_condition(lambda s, l, t: calc_width_col(l, s) > ref_col)
-
-
-class IndentedBlockEndsWith(IndentedBlock):
+class IndentedBlockWithTabs(IndentedBlock):
     def __init__(
         self,
         expr: ParserElement,
-        endswith: Optional[ParserElement] = None,
         recursive: bool = False,
-        grouped: bool = False,
-        shift_width: int = 4,
+        grouped: bool = True,
         tab_width: int = 4,
     ):
         super().__init__(
@@ -62,13 +78,7 @@ class IndentedBlockEndsWith(IndentedBlock):
             recursive=recursive,
             grouped=grouped,
         )
-
-        self.endswith = endswith
-
-        self._shift_width = shift_width
         self._tab_width = tab_width
-
-        self._check_indent = False
 
     def parseImpl(self, instring, loc, doActions=True):
         # advance parse position to non-whitespace by using an Empty()
@@ -80,15 +90,10 @@ class IndentedBlockEndsWith(IndentedBlock):
         self.expr.try_parse(instring, anchor_loc, doActions)
 
         indent_col = col(anchor_loc, instring)
-        indent_spaces = instring[(anchor_loc - indent_col + 1) : anchor_loc]
-        indent_width = calc_width(indent_spaces, tab_width=self._tab_width)
+        indent_num_chars = indent_col - 1
+        indent_chars = instring[(anchor_loc - indent_num_chars) : anchor_loc]
+        indent_width = calc_width(indent_chars, tab_width=self._tab_width)
         indent_width_col = indent_width + 1
-
-        if self._check_indent:
-            is_indentation_multiple_of_four = indent_width % self._shift_width == 0
-            if not is_indentation_multiple_of_four:
-                errmsg = f"Indentation should be multiple of {self._shift_width} but is {indent_width}"
-                raise ParseException(instring, loc, errmsg, self)
 
         peer_detect_expr = IndentPeerDetect(indent_width_col)
 
@@ -99,19 +104,13 @@ class IndentedBlockEndsWith(IndentedBlock):
 
         block = OneOrMore(inner_expr)
 
-        if self.endswith:
-            inner_endswith_expr = Empty() + peer_detect_expr + self.endswith
-
-            block = OneOrMore(inner_expr + FollowedBy(Opt(inner_endswith_expr)))
-            block += Opt(inner_endswith_expr)
-
         if self._grouped:
             block = Group(block)
 
         return block.parseImpl(instring, anchor_loc, doActions)
 
 
-class ConvertToFactoryOutputAction(Generic[T]):
+class ConvertToFactoryOutputAction(Generic[T], Callable[[str, int, ParseResults], T]):
     def __init__(self, factory: Callable[..., T]):
         self._factory = factory
         self._factory_signature = signature(self._factory)
@@ -153,6 +152,8 @@ class ConvertToFactoryOutputAction(Generic[T]):
         ]
 
     def __call__(self, instring: str, loc: int, tokenlist: ParseResults) -> T:
+        # pylint: disable=arguments-differ
+
         args = tokenlist.as_list()
         kwargs = tokenlist.as_dict()
 
@@ -243,9 +244,7 @@ class ConverterUsingFactoryToNode(TrackLocation, ConverterUsingFactory[AST]):
 
 
 def ConvertToNode(factory: Callable[..., AST]):
-    action: ParseAction = ConvertToFactoryOutputAction(factory)
+    def Inner(expr: ParserElement):
+        return ConverterUsingFactoryToNode(expr, factory)
 
-    def SetParseAction(expr: ParserElement):
-        return expr.set_parse_action(action)
-
-    return SetParseAction
+    return Inner

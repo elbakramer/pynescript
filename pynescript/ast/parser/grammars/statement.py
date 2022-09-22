@@ -20,6 +20,7 @@ from pynescript.ast.parser.tokens import (
     ASSIGN,
 )
 from pynescript.ast.parser.parser_elements import (
+    ResultNameableForward as Forward,
     ConvertToNode,
 )
 
@@ -29,6 +30,7 @@ expression = Forward()
 local_body = Forward()
 
 common_statement = assignment | structure | expression
+common_statement.set_name("common_statement")
 
 import_statement = (
     Suppress(IMPORT)
@@ -40,6 +42,7 @@ import_statement = (
     + Suppress(AS)
     + IDENTIFIER
 )
+import_statement.set_name("import_statement")
 
 default_value = expression
 
@@ -65,6 +68,7 @@ function_declaration = ConvertToNode(ast.FunctionDef)(
     + Suppress(RIGHT_DOUBLE_ARROW)
     + local_body("body")
 )
+function_declaration.set_name("function_declaration")
 
 global_only_statement = import_statement | function_declaration
 
@@ -78,8 +82,14 @@ local_only_statement = jump_statement
 global_atomic_statement = global_only_statement | common_statement
 local_atomic_statement = local_only_statement | common_statement
 
+global_atomic_statement.set_name("global_atomic_statement")
+local_atomic_statement.set_name("local_atomic_statement")
+
 global_statement = delimited_list(global_atomic_statement, COMMA)
 local_statement = delimited_list(local_atomic_statement, COMMA)
+
+global_statement.set_name("global_statement")
+local_statement.set_name("local_statement")
 
 statement = (
     break_statement
@@ -90,3 +100,4 @@ statement = (
     | structure
     | expression
 )
+statement.set_name("statement")

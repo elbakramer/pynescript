@@ -1,5 +1,3 @@
-import re
-
 from io import IOBase, RawIOBase, TextIOBase, BytesIO, TextIOWrapper
 from os import PathLike
 from pathlib import Path
@@ -13,8 +11,11 @@ from pyparsing.exceptions import ParseException
 
 from pynescript import ast
 from pynescript.ast.types import AST
-from pynescript.ast.parser.grammars import script, version_comment
-from pynescript.ast.parser.utils import recursion_limit as recursion_limit_context
+from pynescript.ast.parser.grammars import version_comment, comment_suppressed, script
+from pynescript.ast.parser.utils import (
+    calc_width,
+    recursion_limit as recursion_limit_context,
+)
 
 
 def parse_string(
@@ -23,16 +24,18 @@ def parse_string(
     expand_tabs: bool = True,
     debug: bool = False,
     tab_width: int = 4,
-    recursion_limit: int = 5000,
+    recursion_limit: int = 1000,
 ) -> AST:
-    script_expr = script
-    version_comment_expr = version_comment
+    version_comment_expr = version_comment.copy()
+    comment_suppressed_expr = comment_suppressed.copy()
+    script_expr = script.copy()
+
+    version_comment_expr = version_comment_expr.parse_with_tabs()
+    comment_suppressed_expr = comment_suppressed_expr.parse_with_tabs()
+    script_expr = script_expr.parse_with_tabs()
 
     script_node = None
     script_version = None
-
-    script_expr.parse_with_tabs()
-    version_comment_expr.parse_with_tabs()
 
     if expand_tabs:
         code = code.expandtabs(tab_width)
@@ -40,11 +43,16 @@ def parse_string(
     version_results = version_comment_expr.search_string(code)
 
     if version_results:
-        script_version = version_results.get("version")
+        version_result = version_results[0]
+        script_version = version_result.get("version")
+
+    code_without_comment = comment_suppressed_expr.transform_string(code, debug=False)
 
     if debug:
         code_expanded = code.expandtabs(tab_width)
         code_formatted_for_debug = pyparsing.testing.with_line_numbers(code_expanded)
+
+        code_lines = code.split("\n")
         code_lines_formatted_for_debug = code_formatted_for_debug.split("\n")
 
         actual_code_start_line_index = 0
@@ -58,31 +66,32 @@ def parse_string(
                 actual_code_start_column_index = len(line.split(":", 1)[0]) + 1
                 break
 
+        indent_from_formatting = " " * actual_code_start_column_index
+
     try:
         with recursion_limit_context(recursion_limit):
-            parse_result = script_expr.parse_string(code, parse_all=parse_all)
+            parse_result = script_expr.parse_string(
+                code_without_comment, parse_all=parse_all
+            )
 
     except ParseException as err:
         if debug:
             print()
             print("Error while parsing code:")
 
-            for i, line in enumerate(code_lines_formatted_for_debug):
+            for i, formatted_line in enumerate(code_lines_formatted_for_debug):
+                print(formatted_line)
+
                 lineno = i - actual_code_start_line_index + 1
 
-                if lineno != err.lineno:
-                    print(line)
+                if err.lineno != lineno:
                     continue
 
-                code_line_prefix = line.split(":", 1)[0] + ":"
-                err_line = err.line
+                code_line = code_lines[err.lineno - 1]
+                code_line_until_col = code_line[: (err.col - 1)]
+                indent_until_col = calc_width(code_line_until_col, tab_width=tab_width)
 
-                print(f"{code_line_prefix}{err_line}")
-
-                code_indent = code[(err.loc - err.col + 1) : err.loc]
-                code_indent = re.sub("[^\t]", " ", code_indent)
-
-                arrow_indent = " " * actual_code_start_column_index + code_indent
+                arrow_indent = indent_from_formatting + indent_until_col
                 arrow = "^"
 
                 print(f"{arrow_indent}{arrow}")
@@ -106,8 +115,9 @@ def parse(
     encoding: Optional[str] = None,
     parse_all: bool = True,
     expand_tabs: bool = True,
-    tab_width: int = 4,
     debug: bool = False,
+    tab_width: int = 4,
+    recursion_limit: int = 1000,
 ) -> AST:
     if encoding is None:
         encoding = "utf-8"
@@ -137,8 +147,9 @@ def parse(
             code,
             parse_all=parse_all,
             expand_tabs=expand_tabs,
-            tab_width=tab_width,
             debug=debug,
+            tab_width=tab_width,
+            recursion_limit=recursion_limit,
         )
 
         return script_node
@@ -173,15 +184,8 @@ def cli():
     help="Path to output dump file, defaults to standard output.",
     default="-",
 )
-@click.option(
-    "--enable-warnings",
-    is_flag=True,
-)
-def parse_command(filename, encoding, indent, output_file, enable_warnings):
+def parse_command(filename, encoding, indent, output_file):
     from pynescript.ast.helpers import dump
-
-    if enable_warnings:
-        pyparsing.enable_all_warnings()
 
     with click.open_file(filename, "r", encoding=encoding) as f:
         script_node = parse(f, encoding=encoding)

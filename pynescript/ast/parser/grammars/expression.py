@@ -7,6 +7,7 @@ from pyparsing import delimited_list, infix_notation
 
 from pynescript import ast
 from pynescript.ast.parser.parser_elements import (
+    ResultNameableForward as Forward,
     ConvertToNode,
 )
 from pynescript.ast.parser.tokens import (

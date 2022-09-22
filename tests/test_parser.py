@@ -1,4 +1,5 @@
 import os
+import glob
 import contextlib
 
 import pytest
@@ -28,21 +29,13 @@ def test_parse(builtin_scripts_dir):
 
     pyparsing.enable_all_warnings()
 
-    builtin_script_filenames = os.listdir(builtin_scripts_dir)
-    builtin_script_filenames_count = len(builtin_script_filenames)
+    builtin_script_filepaths = glob.glob(os.path.join(builtin_scripts_dir, "*.pine"))
+    builtin_script_filepaths_count = len(builtin_script_filepaths)
 
     exception_count = 0
 
-    filenames_to_skip = [
-        "pivot_points_standard.pine",
-    ]
-
-    for i, filename in enumerate(builtin_script_filenames):
-        if filename in filenames_to_skip:
-            print(f"SKIP ({i + 1}/{builtin_script_filenames_count}): {filename}")
-            continue
-
-        filepath = os.path.join(builtin_scripts_dir, filename)
+    for i, filepath in enumerate(builtin_script_filepaths):
+        filename = os.path.basename(filepath)
 
         with open(filepath, encoding="utf-8") as f:
             code = f.read()
@@ -51,12 +44,12 @@ def test_parse(builtin_scripts_dir):
             parse(code, debug=True)
         except ParseException:
             exception_count += 1
-            print(f"FAIL ({i + 1}/{builtin_script_filenames_count}): {filename}")
-            # raise
+            print(f"FAIL ({i + 1}/{builtin_script_filepaths_count}): {filename}")
+            raise
         else:
-            print(f"PASS ({i + 1}/{builtin_script_filenames_count}): {filename}")
+            print(f"PASS ({i + 1}/{builtin_script_filepaths_count}): {filename}")
 
     if exception_count > 0:
         raise pytest.fail(
-            f"Total fails: {exception_count}/{builtin_script_filenames_count}"
+            f"Total fails: {exception_count}/{builtin_script_filepaths_count}"
         )

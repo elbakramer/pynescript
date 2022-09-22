@@ -1,19 +1,4 @@
-from pyparsing import Keyword
-
-from .type_keywords import (
-    INT,
-    FLOAT,
-    BOOL,
-    COLOR,
-    STRING,
-    LABEL,
-    LINE,
-    LINEFILL,
-    ARRAY,
-    MATRIX,
-    BOX,
-    TABLE,
-)
+from pyparsing import Keyword, MatchFirst
 
 AND = Keyword("and")
 AS = Keyword("as")
@@ -40,70 +25,27 @@ VAR = Keyword("var")
 VARIP = Keyword("varip")
 WHILE = Keyword("while")
 
-KEYWORD = (
-    AND
-    | AS
-    | ARRAY
-    | BREAK
-    | BY
-    | CONST
-    | CONTINUE
-    | ELSE
-    | EXPORT
-    | FALSE
-    | FOR
-    | IN
-    | IF
-    | IMPORT
-    | NA
-    | NOT
-    | OR
-    | SERIES
-    | SIMPLE
-    | SWITCH
-    | TO
-    | TRUE
-    | VAR
-    | VARIP
-    | WHILE
-    | INT
-    | FLOAT
-    | BOOL
-    | COLOR
-    | STRING
-    | LABEL
-    | LINEFILL
-    | LINE
-    | MATRIX
-    | BOX
-    | TABLE
-)
-
-LITERAL_KEYWORD = TRUE | FALSE | NA
-
-TYPE_KEYWORD = (
-    INT | FLOAT | BOOL | COLOR | STRING | LABEL | LINEFILL | LINE | MATRIX | BOX | TABLE
-)
-
-SYNTAX_KEYWORD = (
-    AND
-    | AS
-    | BREAK
-    | BY
-    | CONST
-    | CONTINUE
-    | ELSE
-    | EXPORT
-    | FOR
-    | IN
-    | IF
-    | IMPORT
-    | NOT
-    | OR
-    | SIMPLE
-    | SWITCH
-    | TO
-    | VAR
-    | VARIP
-    | WHILE
+SYNTAX_KEYWORD = MatchFirst(
+    [
+        AND,
+        AS,
+        BREAK,
+        BY,
+        CONST,
+        CONTINUE,
+        ELSE,
+        EXPORT,
+        FOR,
+        IN,
+        IF,
+        IMPORT,
+        NOT,
+        OR,
+        SIMPLE,
+        SWITCH,
+        TO,
+        VAR,
+        VARIP,
+        WHILE,
+    ]
 )

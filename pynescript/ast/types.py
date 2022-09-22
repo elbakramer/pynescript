@@ -163,15 +163,24 @@ AtomicTypeName = Union[
 CollectionTypeName = Union[Array, Matrix]
 
 
-class TypeReference(AST):
+class CollectionType(AST):
     def __init__(
         self,
-        name: Union[AtomicTypeName, CollectionTypeName],
-        argument: Optional[AtomicTypeName] = None,
+        type_name: CollectionTypeName,
+        type_argument: TypeSpecifier,
     ):
         super().__init__()
-        self.name = name
-        self.argument = argument
+        self.type_name = type_name
+        self.type_argument = type_argument
+
+
+class ArrayType(AST):
+    def __init__(self, element_type: TypeSpecifier):
+        super().__init__()
+        self.element_type = element_type
+
+
+TypeSpecifier = Union[CollectionType, ArrayType, AtomicTypeName]
 
 
 class Assign(AST):
@@ -220,7 +229,7 @@ class Assignment(AST):
         value: Union[Expression, Structure],
         operator: Optional[AssignOperator],
         declaration_mode: Optional[DeclarationMode] = None,
-        type_specifier: Optional[TypeReference] = None,
+        type_specifier: Optional[TypeSpecifier] = None,
     ):
         super().__init__()
         self.target = target
@@ -270,10 +279,12 @@ class Call(AST):
         self,
         name: Union[Name, Attribute],
         arguments: Optional[Sequence[Argument]] = None,
+        type_argument: Optional[AtomicTypeName] = None,
     ):
         super().__init__()
         self.name = name
         self.arguments = arguments
+        self.type_argument = type_argument
 
 
 class If(AST):

@@ -1,20 +1,17 @@
 from pyparsing import (
     Forward,
-    Suppress,
-    Combine,
     Opt,
 )
 
 from pynescript import ast
 from pynescript.ast.parser.parser_elements import (
+    ResultNameableForward as Forward,
     ConvertToNode,
 )
 from pynescript.ast.parser.tokens import (
     IDENTIFIER,
     VAR,
     VARIP,
-    LBRACKET,
-    RBRACKET,
     ASSIGN,
     COLON_ASSIGN,
     MUL_ASSIGN,
@@ -27,35 +24,13 @@ from pynescript.ast.parser.tokens import (
 structure = Forward()
 expression = Forward()
 
-atomic_type_name = Forward()
-collection_type_name = Forward()
-type_argument = Forward()
+type_specifier = Forward()
 identifier_declarator = Forward()
 tuple_declarator = Forward()
 function_call = Forward()
 
-
 declaration_mode = ConvertToNode(ast.Var)(VAR) | ConvertToNode(ast.VarIp)(VARIP)
-
-
-def handle_array_type_specifier(argument):
-    node = ast.TypeReference(ast.Subscript(argument))
-    return node
-
-
-array_type_specifier = ConvertToNode(handle_array_type_specifier)(
-    Combine(atomic_type_name("value") + Suppress(Combine(LBRACKET + RBRACKET)))
-)
-
-collection_type_specifier = ConvertToNode(ast.TypeReference)(
-    collection_type_name("name") + type_argument("argument")
-)
-
-atomic_type_specifier = ConvertToNode(ast.TypeReference)(atomic_type_name("name"))
-
-type_specifier = (
-    collection_type_specifier | array_type_specifier | atomic_type_specifier
-)
+declaration_mode.set_name("declaration_mode")
 
 assignment_operator = ConvertToNode(ast.Assign)(ASSIGN)
 
@@ -66,14 +41,17 @@ identifier_declarator_declaration = ConvertToNode(ast.Assignment)(
     + assignment_operator("operator")
     + (structure | expression)("value")
 )
+identifier_declarator_declaration.set_name("identifier_declarator_declaration")
 
 tuple_declarator_declaration = ConvertToNode(ast.Assignment)(
     tuple_declarator("target")
     + assignment_operator("operator")
     + (structure | function_call)("value")
 )
+tuple_declarator_declaration.set_name("tuple_declarator_declaration")
 
 variable_declaration = identifier_declarator_declaration | tuple_declarator_declaration
+variable_declaration.set_name("variable_declaration")
 
 reassignment_operator = (
     ConvertToNode(ast.ColonAssign)(COLON_ASSIGN)
@@ -89,5 +67,7 @@ variable_reassignment = ConvertToNode(ast.Assignment)(
     + reassignment_operator("operator")
     + (structure | expression)("value")
 )
+variable_reassignment.set_name("variable_reassignment")
 
 assignment = variable_declaration | variable_reassignment
+assignment.set_name("assignment")
