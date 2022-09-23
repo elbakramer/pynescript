@@ -29,28 +29,27 @@ expression = Forward()
 
 local_block = Forward()
 local_body = Forward()
+
 identifier_declarator = Forward()
 declarator = Forward()
 
 if_structure = Forward()
 
-if_structure_impl = ConvertToNode(ast.If)(
+if_structure <<= ConvertToNode(ast.If)(
     Suppress(IF)
     + expression("condition")
-    + local_block("body")
-    + Opt(Suppress(ELSE) + (Group(if_structure) | local_block)("orelse"))
+    + Group(local_block)("body")
+    + Opt(Suppress(ELSE) + Group(if_structure | local_block)("orelse"))
 )
-
-if_structure <<= if_structure_impl
 if_structure.set_name("if_structure")
 
 expression_switch_case = ConvertToNode(ast.SwitchCase)(
-    expression("expression") + Suppress(RIGHT_DOUBLE_ARROW) + local_body("body")
+    expression("expression") + Suppress(RIGHT_DOUBLE_ARROW) + Group(local_body)("body")
 )
 expression_switch_case.set_name("expression_switch_case")
 
 default_switch_case = ConvertToNode(ast.SwitchCase)(
-    Suppress(RIGHT_DOUBLE_ARROW) + local_body("body")
+    Suppress(RIGHT_DOUBLE_ARROW) + Group(local_body)("body")
 )
 default_switch_case.set_name("default_switch_case")
 
@@ -60,12 +59,12 @@ switch_case.set_name("switch_case")
 switch_structure_cases = IndentedBlock(switch_case)
 
 switch_structure_with_expression = ConvertToNode(ast.Switch)(
-    Suppress(SWITCH) + expression("expression") + switch_structure_cases("cases")
+    Suppress(SWITCH) + expression("expression") + Group(switch_structure_cases)("cases")
 )
 switch_structure_with_expression.set_name("switch_structure_with_expression")
 
 switch_structure_without_expression = ConvertToNode(ast.Switch)(
-    Suppress(SWITCH) + switch_structure_cases("cases")
+    Suppress(SWITCH) + Group(switch_structure_cases)("cases")
 )
 switch_structure_without_expression.set_name("switch_structure_without_expression")
 
@@ -88,12 +87,14 @@ for_statement_from_to_by = (
 for_statement_in = declarator("target") + Suppress(IN) + expression("initial_value")
 
 for_structure = ConvertToNode(ast.For)(
-    Suppress(FOR) + (for_statement_from_to_by | for_statement_in) + local_block("body")
+    Suppress(FOR)
+    + (for_statement_from_to_by | for_statement_in)
+    + Group(local_block)("body")
 )
 for_structure.set_name("for_structure")
 
 while_structure = ConvertToNode(ast.While)(
-    Suppress(WHILE) + expression("condition") + local_block("body")
+    Suppress(WHILE) + expression("condition") + Group(local_block)("body")
 )
 while_structure.set_name("while_structure")
 

@@ -199,6 +199,7 @@ class ConvertToFactoryOutputAction(Generic[T], Callable[[str, int, ParseResults]
 class ConverterUsingFactory(TokenConverter, Generic[T]):
     def __init__(self, expr: ParserElement, factory: Callable[..., T]):
         super().__init__(expr)
+
         self._action = ConvertToFactoryOutputAction(factory)
 
     def postParse(self, instring, loc, tokenlist) -> T:

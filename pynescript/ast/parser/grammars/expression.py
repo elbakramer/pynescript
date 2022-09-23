@@ -36,7 +36,9 @@ from pynescript.ast.parser.tokens import (
 )
 
 attributed_name = Forward()
+
 function_call = Forward()
+structure = Forward()
 
 expression = Forward()
 expression.set_name("expression")
@@ -64,21 +66,20 @@ tuple_expression = ConvertToNode(ast.Tuple)(
 )
 
 function_call_expression = function_call
-
-identifier_starting_primary_expression = (
-    load_name_expression ^ history_referencing_expression ^ function_call_expression
-)
+structure_expression = structure
 
 primary_expression = (
     constant_expression
-    | identifier_starting_primary_expression
-    | grouped_expression
     | tuple_expression
+    | grouped_expression
+    | function_call_expression
+    | history_referencing_expression
+    | load_name_expression
 )
 
 unary_operator = (
-    ConvertToNode(ast.Add)(ADD)
-    | ConvertToNode(ast.Sub)(SUB)
+    ConvertToNode(ast.UAdd)(ADD)
+    | ConvertToNode(ast.USub)(SUB)
     | ConvertToNode(ast.Not)(NOT)
 )
 
@@ -122,12 +123,22 @@ def handle_relational_expression(left, operator, right):
     return node
 
 
+def iterate_logical_expression_values(values, operator):
+    for value in values:
+        if isinstance(value, ast.Boolean) and type(value.operator) is type(operator):
+            for inner_value in iterate_logical_expression_values(
+                value.values, operator
+            ):
+                yield inner_value
+        else:
+            yield value
+
+
 def handle_logical_expression(left, operator, right):
     values = [left, right]
+    values = iterate_logical_expression_values(values, operator)
+    values = list(values)
     node = ast.Boolean(operator, values)
-    if isinstance(left, ast.Boolean) and left.operator == operator:
-        values = left.values + node.values
-        node = ast.Boolean(operator, values)
     return node
 
 
@@ -181,7 +192,6 @@ infix_notation_op_list = [
 infix_notation_expression = infix_notation(
     unary_expression, infix_notation_op_list, Suppress(LPAREN), Suppress(RPAREN)
 )
-
 infix_notation_expression.set_name("infix_notation_expression")
 
 multiplicative_expression = Forward()
@@ -256,4 +266,4 @@ conditional_expression_pattern = ConvertToNode(ast.Ternary)(
 
 conditional_expression <<= conditional_expression_pattern | infix_notation_expression
 
-expression <<= conditional_expression
+expression <<= structure_expression | conditional_expression

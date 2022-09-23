@@ -1,6 +1,7 @@
 from pyparsing import (
     Forward,
     Suppress,
+    Group,
     Opt,
 )
 from pyparsing import delimited_list
@@ -25,11 +26,15 @@ from pynescript.ast.parser.parser_elements import (
 )
 
 assignment = Forward()
-structure = Forward()
 expression = Forward()
+
 local_body = Forward()
 
-common_statement = assignment | structure | expression
+assignment_statement = assignment
+
+expression_statement = ConvertToNode(ast.Expr)(expression("value"))
+
+common_statement = assignment_statement | expression_statement
 common_statement.set_name("common_statement")
 
 import_statement = (
@@ -66,7 +71,7 @@ function_declaration = ConvertToNode(ast.FunctionDef)(
     + Opt(parameter_list("parameters"))
     + Suppress(RPAREN)
     + Suppress(RIGHT_DOUBLE_ARROW)
-    + local_body("body")
+    + Group(local_body)("body")
 )
 function_declaration.set_name("function_declaration")
 
@@ -90,14 +95,3 @@ local_statement = delimited_list(local_atomic_statement, COMMA)
 
 global_statement.set_name("global_statement")
 local_statement.set_name("local_statement")
-
-statement = (
-    break_statement
-    | continue_statement
-    | import_statement
-    | function_declaration
-    | assignment
-    | structure
-    | expression
-)
-statement.set_name("statement")

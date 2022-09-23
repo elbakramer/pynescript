@@ -21,13 +21,12 @@ from pynescript.ast.parser.tokens import (
     SUB_ASSIGN,
 )
 
-structure = Forward()
 expression = Forward()
 
 type_specifier = Forward()
+
 identifier_declarator = Forward()
 tuple_declarator = Forward()
-function_call = Forward()
 
 declaration_mode = ConvertToNode(ast.Var)(VAR) | ConvertToNode(ast.VarIp)(VARIP)
 declaration_mode.set_name("declaration_mode")
@@ -39,14 +38,12 @@ identifier_declarator_declaration = ConvertToNode(ast.Assignment)(
     + Opt(type_specifier("type_specifier"))
     + identifier_declarator("target")
     + assignment_operator("operator")
-    + (structure | expression)("value")
+    + expression("value")
 )
 identifier_declarator_declaration.set_name("identifier_declarator_declaration")
 
 tuple_declarator_declaration = ConvertToNode(ast.Assignment)(
-    tuple_declarator("target")
-    + assignment_operator("operator")
-    + (structure | function_call)("value")
+    tuple_declarator("target") + assignment_operator("operator") + expression("value")
 )
 tuple_declarator_declaration.set_name("tuple_declarator_declaration")
 
@@ -63,9 +60,7 @@ reassignment_operator = (
 )
 
 variable_reassignment = ConvertToNode(ast.Assignment)(
-    IDENTIFIER("target")
-    + reassignment_operator("operator")
-    + (structure | expression)("value")
+    IDENTIFIER("target") + reassignment_operator("operator") + expression("value")
 )
 variable_reassignment.set_name("variable_reassignment")
 

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from abc import ABC
 from typing import Union
 
@@ -32,8 +34,14 @@ class BoolType(Type):
     def __bool__(self):
         return self.x
 
-    def __repr__(self):
+    def __python_repr__(self):
         return repr(self.x)
+
+    def __pinescript_repr__(self):
+        return repr(self.x).lower()
+
+    def __repr__(self):
+        return self.__python_repr__()
 
     @classmethod
     def __subclasshook__(cls, C):
@@ -58,14 +66,27 @@ class ColorType(Type):
         else:
             raise TypeError()
 
-    def __repr__(self):
+    def __python_repr__(self):
         type_name = self.__class__.__name__
         type_value = self.x
         return f"{type_name}({type_value})"
 
+    def __pinescript_repr__(self):
+        return self.x
+
+    def __repr__(self):
+        return self.__python_repr__()
+
 
 class StringType(Type, PythonStringType):
-    pass
+    def __python_repr__(self):
+        return str.__repr__(self)
+
+    def __pinescript_repr__(self):
+        return json.dumps(self, ensure_ascii=False)
+
+    def __repr__(self):
+        return self.__python_repr__()
 
 
 class PlotType(Type):

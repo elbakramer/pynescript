@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pynescript
 
-from pynescript.ast.parser.helpers import parse
+from pynescript.ast import parse, dump
 
 
 def test_random_file():
@@ -18,10 +18,10 @@ def test_random_file():
     script_index = random.randrange(builtin_script_filepaths_count)
     script_filepath = builtin_script_filepaths[script_index]
 
-    res = parse(script_filepath, parse_all=True)
+    tree = parse(script_filepath, debug=True)
 
-    print(res)
     print(script_filepath)
+    print(dump(tree, indent=2))
 
 
 if __name__ == "__main__":

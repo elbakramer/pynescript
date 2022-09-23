@@ -19,7 +19,7 @@ from pynescript.ast.parser.utils import (
 
 
 def parse_string(
-    code: str,
+    source: str,
     parse_all: bool = True,
     expand_tabs: bool = True,
     debug: bool = False,
@@ -38,60 +38,66 @@ def parse_string(
     script_version = None
 
     if expand_tabs:
-        code = code.expandtabs(tab_width)
+        source = source.expandtabs(tab_width)
 
-    version_results = version_comment_expr.search_string(code)
+    version_results = version_comment_expr.search_string(source)
 
     if version_results:
         version_result = version_results[0]
         script_version = version_result.get("version")
 
-    code_without_comment = comment_suppressed_expr.transform_string(code, debug=False)
+    source_without_comment = comment_suppressed_expr.transform_string(
+        source, debug=False
+    )
 
     if debug:
-        code_expanded = code.expandtabs(tab_width)
-        code_formatted_for_debug = pyparsing.testing.with_line_numbers(code_expanded)
+        source_expanded = source.expandtabs(tab_width)
+        source_formatted_for_debug = pyparsing.testing.with_line_numbers(
+            source_expanded
+        )
 
-        code_lines = code.split("\n")
-        code_lines_formatted_for_debug = code_formatted_for_debug.split("\n")
+        source_lines = source.split("\n")
+        source_lines_formatted_for_debug = source_formatted_for_debug.split("\n")
 
-        actual_code_start_line_index = 0
-        actual_code_start_column_index = 0
+        actual_source_start_line_index = 0
+        actual_source_start_column_index = 0
 
-        for i in range(len(code_formatted_for_debug)):
-            line = code_lines_formatted_for_debug[i]
+        for i in range(len(source_formatted_for_debug)):
+            line = source_lines_formatted_for_debug[i]
 
             if line.lstrip().startswith("1:"):
-                actual_code_start_line_index = i
-                actual_code_start_column_index = len(line.split(":", 1)[0]) + 1
+                actual_source_start_line_index = i
+                actual_source_start_column_index = len(line.split(":", 1)[0]) + 1
                 break
-
-        indent_from_formatting = " " * actual_code_start_column_index
 
     try:
         with recursion_limit_context(recursion_limit):
-            parse_result = script_expr.parse_string(
-                code_without_comment, parse_all=parse_all
+            parse_results = script_expr.parse_string(
+                source_without_comment, parse_all=parse_all
             )
 
     except ParseException as err:
         if debug:
             print()
-            print("Error while parsing code:")
+            print("Error while parsing source:")
 
-            for i, formatted_line in enumerate(code_lines_formatted_for_debug):
+            for i, formatted_line in enumerate(source_lines_formatted_for_debug):
                 print(formatted_line)
 
-                lineno = i - actual_code_start_line_index + 1
+                lineno = i - actual_source_start_line_index + 1
 
                 if err.lineno != lineno:
                     continue
 
-                code_line = code_lines[err.lineno - 1]
-                code_line_until_col = code_line[: (err.col - 1)]
-                indent_until_col = calc_width(code_line_until_col, tab_width=tab_width)
+                source_line = source_lines[err.lineno - 1]
+                source_line_until_col = source_line[: (err.col - 1)]
+                indent_until_col = calc_width(
+                    source_line_until_col, tab_width=tab_width
+                )
 
-                arrow_indent = indent_from_formatting + indent_until_col
+                arrow_indent = " " * (
+                    actual_source_start_column_index + indent_until_col
+                )
                 arrow = "^"
 
                 print(f"{arrow_indent}{arrow}")
@@ -99,8 +105,8 @@ def parse_string(
 
         raise err
 
-    if parse_result:
-        script_node = parse_result[0]
+    if parse_results:
+        script_node = parse_results[0]
     else:
         script_node = ast.Script([])
 
@@ -110,7 +116,7 @@ def parse_string(
     return script_node
 
 
-def parse(
+def parse_file(
     f: Union[str, PathLike, bytes, IOBase],
     encoding: Optional[str] = None,
     parse_all: bool = True,
@@ -123,14 +129,10 @@ def parse(
         encoding = "utf-8"
 
     with ExitStack() as stack:
-        code = None
+        source = None
 
         if isinstance(f, str):
-            filename = Path(f)
-            if filename.exists():
-                f = filename
-            else:
-                code = f
+            f = Path(f)
         if isinstance(f, Path):
             f = stack.enter_context(open(f, encoding=encoding))
         if isinstance(f, bytes):
@@ -138,13 +140,13 @@ def parse(
         if isinstance(f, RawIOBase):
             f = TextIOWrapper(f, encoding=encoding)
         if isinstance(f, TextIOBase):
-            code = f.read()
+            source = f.read()
 
-        if code is None:
+        if source is None:
             raise TypeError(f"Unsupported argument type: {type(f)}")
 
         script_node = parse_string(
-            code,
+            source,
             parse_all=parse_all,
             expand_tabs=expand_tabs,
             debug=debug,
@@ -153,6 +155,36 @@ def parse(
         )
 
         return script_node
+
+
+def parse(
+    source: Union[str, PathLike, bytes, IOBase],
+    encoding: Optional[str] = None,
+    parse_all: bool = True,
+    expand_tabs: bool = True,
+    debug: bool = False,
+    tab_width: int = 4,
+    recursion_limit: int = 1000,
+) -> AST:
+    if isinstance(source, str) and not Path(source).exists():
+        return parse_string(
+            source,
+            parse_all=parse_all,
+            expand_tabs=expand_tabs,
+            debug=debug,
+            tab_width=tab_width,
+            recursion_limit=recursion_limit,
+        )
+    else:
+        return parse_file(
+            source,
+            encoding=encoding,
+            parse_all=parse_all,
+            expand_tabs=expand_tabs,
+            debug=debug,
+            tab_width=tab_width,
+            recursion_limit=recursion_limit,
+        )
 
 
 @click.group()
@@ -188,7 +220,7 @@ def parse_command(filename, encoding, indent, output_file):
     from pynescript.ast.helpers import dump
 
     with click.open_file(filename, "r", encoding=encoding) as f:
-        script_node = parse(f, encoding=encoding)
+        script_node = parse_file(f, encoding=encoding)
 
     script_node_dump = dump(script_node, indent=indent)
 

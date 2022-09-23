@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC
+from collections.abc import Hashable
 from typing import Sequence, Union, Optional, TypeVar, Generic
 
 from pynescript.types import (
@@ -30,7 +31,17 @@ E = TypeVar("E", bound="Expression")
 # ast nodes
 
 
-class AST(ABC):
+class AST(ABC, Hashable):
+
+    location_fields = [
+        "loc",
+        "end_loc",
+        "lineno",
+        "col_offset",
+        "end_lineno",
+        "end_col_offset",
+    ]
+
     def __init__(self):
         self.loc: Optional[BuiltinInt] = None
         self.end_loc: Optional[BuiltinInt] = None
@@ -43,6 +54,14 @@ class AST(ABC):
         for name, value in kwargs.items():
             setattr(self, name, value)
 
+    def iter_fields(self):
+        for field in self.__dict__.keys():
+            if field not in self.location_fields:
+                try:
+                    yield field, getattr(self, field)
+                except AttributeError:
+                    pass
+
     def __eq__(self, other):
         if isinstance(other, type(self)):
             return self.__dict__ == other.__dict__
@@ -52,6 +71,9 @@ class AST(ABC):
         from pynescript.ast.helpers import dump
 
         return dump(self)
+
+    def __hash__(self):
+        return id(self)
 
 
 class Script(AST):
@@ -254,13 +276,13 @@ class FunctionDef(AST):
     def __init__(
         self,
         name: Identifier,
-        parameters: Sequence[Parameter],
         body: Sequence[Statement],
+        parameters: Optional[Sequence[Parameter]] = None,
     ):
         super().__init__()
         self.name = name
-        self.parameters = parameters
         self.body = body
+        self.parameters = parameters
 
 
 class Argument(AST):
@@ -277,12 +299,12 @@ class Argument(AST):
 class Call(AST):
     def __init__(
         self,
-        name: Union[Name, Attribute],
+        func: Union[Name, Attribute],
         arguments: Optional[Sequence[Argument]] = None,
         type_argument: Optional[AtomicTypeName] = None,
     ):
         super().__init__()
-        self.name = name
+        self.func = func
         self.arguments = arguments
         self.type_argument = type_argument
 
@@ -333,17 +355,17 @@ class Continue(AST):
 class For(AST):
     def __init__(
         self,
+        body: Sequence[Statement],
         target: Identifier,
         initial_value: Expression,
-        final_value: Expression,
-        body: Sequence[Statement],
+        final_value: Optional[Expression] = None,
         increment_value: Optional[Expression] = None,
     ):
         super().__init__()
+        self.body = body
         self.target = target
         self.initial_value = initial_value
         self.final_value = final_value
-        self.body = body
         self.increment_value = increment_value
 
 
@@ -358,6 +380,12 @@ class While(AST):
         self.body = body
 
 
+class Expr(AST):
+    def __init__(self, value: Expression):
+        super().__init__()
+        self.value = value
+
+
 Structure = Union[
     If,
     Switch,
@@ -368,8 +396,7 @@ Structure = Union[
 Statement = Union[
     Assignment,
     FunctionDef,
-    Call,
-    Structure,
+    Expr,
     Break,
     Continue,
 ]
@@ -436,8 +463,6 @@ BinaryOperator = Union[
     Mult,
     Div,
     Mod,
-    And,
-    Or,
 ]
 
 
@@ -533,4 +558,6 @@ Expression = Union[
     Binary,
     Unary,
     Compare,
+    Structure,
+    Call,
 ]

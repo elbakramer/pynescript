@@ -157,7 +157,7 @@ argument = ConvertToNode(ast.Argument)(full_argument | value_only_argument)
 argument_list = delimited_list(argument, COMMA)
 
 function_call = ConvertToNode(ast.Call)(
-    attributed_name("name")
+    attributed_name("func")
     + Opt(type_argument("type_argument"))
     + Suppress(LPAREN)
     + Opt(argument_list("arguments"))
@@ -175,7 +175,7 @@ tuple_declarator.set_name("tuple_declarator")
 declarator = tuple_declarator | identifier_declarator
 
 local_block = IndentedBlock(local_statement)
-local_body = local_block | Group(local_statement)
+local_body = local_block | local_statement
 
 local_block.set_name("local_block")
 local_body.set_name("local_body")
