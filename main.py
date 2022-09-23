@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pynescript
 
-from pynescript.ast import parse, dump
+from pynescript.ast import dump
+from pynescript.ast import parse
 
 
 def test_random_file():

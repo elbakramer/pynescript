@@ -2,7 +2,8 @@ import glob
 
 from pathlib import Path
 
-from pytest import Parser, Metafunc
+from pytest import Metafunc
+from pytest import Parser
 
 
 def pytest_addoption(parser: Parser):

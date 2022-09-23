@@ -1,5 +1,5 @@
-from pynescript.ast.parser.helpers import parse
 from pynescript.ast.helpers import unparse
+from pynescript.ast.parser.helpers import parse
 
 
 def test_unparse(pinescript_filepath):
