@@ -2,7 +2,6 @@
 
 ## pynescript
 
-```{eval-rst}
-.. toctree::
-    reference/pynescript.rst
+```{toctree}
+apidoc/modules
 ```

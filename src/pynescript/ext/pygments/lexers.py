@@ -89,6 +89,8 @@ class PyparsingToken(TokenConverter):
     def postParse(self, instring: str, loc: int, tokenlist: ParseResults):
         if self.token is None:
             return []
+        if len(tokenlist) == 0:
+            return []
         return [(loc, self.token, str(tokenlist[0]))]
 
 
@@ -105,7 +107,7 @@ class PinescriptLexer(Lexer):
             PyparsingToken(Keyword("version"), Token.Keyword),
             PyparsingToken(Literal("="), Token.Punctuation),
             PyparsingToken(common.integer("version"), Token.Literal.Number),
-            PyparsingToken(FollowedBy(LineEnd())),
+            FollowedBy(LineEnd()),
         ]
     )
     comment_expr = PyparsingToken(

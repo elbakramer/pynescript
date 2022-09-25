@@ -242,9 +242,9 @@ def docs(session: Session) -> None:
     """Build and serve the documentation with live reloading on file changes."""
     args = session.posargs or [
         "--ignore",
-        "**/docs/reference",
+        "**/docs/apidoc",
         "--ignore",
-        "**/docs/reference/**",
+        "**/docs/apidoc/**",
         "--open-browser",
         "docs",
         "docs/_build",

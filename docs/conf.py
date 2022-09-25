@@ -26,7 +26,7 @@ def run_apidoc(_) -> None:
 
     project_dir = docs_dir.parent
 
-    output_path = project_dir / "docs/reference"
+    output_path = project_dir / "docs/apidoc"
     module_path = project_dir / "src/pynescript"
 
     if output_path.exists():

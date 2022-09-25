@@ -7,6 +7,6 @@
 /.vscode/
 /dist/
 /docs/_build/
-/docs/reference/
+/docs/apidoc/
 /src/*.egg-info/
 __pycache__/
