@@ -168,7 +168,7 @@ class SimpleScriptExecutor(NodeTransformer):
                     gain = price - self.pos_price
                     print(
                         f"[{label}] closing short position "
-                        "at price {price} with gain {gain}, "
+                        f"at price {price} with gain {gain}, "
                         f"comment = {comment}"
                     )
                     self.cash += gain

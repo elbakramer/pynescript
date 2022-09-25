@@ -75,6 +75,11 @@ print(unparsed_script)
 Traversing and transforming parsed AST nodes
 
 ```python
+import collections
+
+import numpy as np
+import pandas as pd
+
 from pynescript import ast
 from pynescript.ast import parse_string
 from pynescript.ast import NodeVisitor, NodeTransformer
@@ -176,7 +181,7 @@ class SimpleScriptExecutor(NodeTransformer):
                     gain = price - self.pos_price
                     print(
                         f"[{label}] closing short position "
-                        "at price {price} with gain {gain}, "
+                        f"at price {price} with gain {gain}, "
                         f"comment = {comment}"
                     )
                     self.cash += gain
