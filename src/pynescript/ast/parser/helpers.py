@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Optional
 from typing import Union
 
-import click
 import pyparsing
 
 from pyparsing.exceptions import ParseException
@@ -190,48 +189,3 @@ def parse(
             tab_width=tab_width,
             recursion_limit=recursion_limit,
         )
-
-
-@click.group()
-def cli():
-    pass
-
-
-@cli.command("parse", short_help="Parse pinescript file.")
-@click.argument(
-    "filename",
-    metavar="PATH",
-    type=click.Path(exists=True, file_okay=True, dir_okay=False, readable=True),
-)
-@click.option(
-    "--encoding",
-    default="utf-8",
-    help="Text encoding of the file.",
-)
-@click.option(
-    "--indent",
-    type=int,
-    default=2,
-    help="Indentation with of an AST dump.",
-)
-@click.option(
-    "--output-file",
-    metavar="PATH",
-    type=click.Path(writable=True, allow_dash=True),
-    help="Path to output dump file, defaults to standard output.",
-    default="-",
-)
-def parse_command(filename, encoding, indent, output_file):
-    from pynescript.ast.helpers import dump
-
-    with click.open_file(filename, "r", encoding=encoding) as f:
-        script_node = parse_file(f, encoding=encoding)
-
-    script_node_dump = dump(script_node, indent=indent)
-
-    with click.open_file(output_file, "w", encoding=encoding) as f:
-        f.write(script_node_dump)
-
-
-if __name__ == "__main__":
-    cli()

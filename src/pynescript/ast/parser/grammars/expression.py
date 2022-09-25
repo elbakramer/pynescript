@@ -1,4 +1,3 @@
-from pyparsing import Forward
 from pyparsing import OpAssoc
 from pyparsing import Suppress
 from pyparsing import delimited_list

@@ -1,4 +1,3 @@
-from pyparsing import Forward
 from pyparsing import Group
 from pyparsing import Opt
 from pyparsing import Suppress

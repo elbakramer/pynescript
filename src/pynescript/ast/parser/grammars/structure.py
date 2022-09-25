@@ -1,6 +1,4 @@
-from pyparsing import Forward
 from pyparsing import Group
-from pyparsing import IndentedBlock
 from pyparsing import Opt
 from pyparsing import Suppress
 
@@ -70,22 +68,26 @@ switch_structure.set_name("switch_structure")
 
 conditional_structure = if_structure | switch_structure
 
-for_statement_from_to_by = (
-    identifier_declarator("target")
+for_from_to_structure = ConvertToNode(ast.For)(
+    Suppress(FOR)
+    + identifier_declarator("target")
     + Suppress(ASSIGN)
     + expression("initial_value")
     + Suppress(TO)
     + expression("final_value")
     + Opt(Suppress(BY) + expression("increment_value"))
-)
-
-for_statement_in = declarator("target") + Suppress(IN) + expression("initial_value")
-
-for_structure = ConvertToNode(ast.For)(
-    Suppress(FOR)
-    + (for_statement_from_to_by | for_statement_in)
     + Group(local_block)("body")
 )
+
+for_in_structure = ConvertToNode(ast.ForIn)(
+    Suppress(FOR)
+    + declarator("target")
+    + Suppress(IN)
+    + expression("iterate_value")
+    + Group(local_block)("body")
+)
+
+for_structure = for_from_to_structure | for_in_structure
 for_structure.set_name("for_structure")
 
 while_structure = ConvertToNode(ast.While)(

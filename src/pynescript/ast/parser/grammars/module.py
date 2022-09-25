@@ -1,5 +1,4 @@
 from pyparsing import FollowedBy
-from pyparsing import Forward
 from pyparsing import Group
 from pyparsing import Keyword
 from pyparsing import LineEnd

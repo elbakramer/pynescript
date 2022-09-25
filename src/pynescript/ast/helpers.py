@@ -1,13 +1,30 @@
 from __future__ import annotations
 
-from typing import Optional
-from typing import Union
-
 from pynescript.ast.types import AST
 
 
 def iter_fields(node: AST):
     return node.iter_fields()
+
+
+def iter_child_nodes(node):
+    for _name, field in iter_fields(node):
+        if isinstance(field, AST):
+            yield field
+        elif isinstance(field, list):
+            for item in field:
+                if isinstance(item, AST):
+                    yield item
+
+
+def walk(node):
+    from collections import deque
+
+    todo = deque([node])
+    while todo:
+        node = todo.popleft()
+        todo.extend(iter_child_nodes(node))
+        yield node
 
 
 def _dump_value_impl(value, indent: str = "", depth: int = 0):

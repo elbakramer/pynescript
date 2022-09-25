@@ -1,10 +1,10 @@
+"""Type for parsing and building AST."""
+
 from __future__ import annotations
 
 from abc import ABC
 from collections.abc import Hashable
-from typing import Generic
 from typing import Sequence
-from typing import TypeVar
 from typing import Union
 
 from pynescript.types import BoolType
@@ -22,11 +22,6 @@ Identifier = PythonStringType
 BuiltinInt = PythonIntType
 BuiltinString = PythonStringType
 ConstantType = Union[IntType, FloatType, BoolType, ColorType, StringType]
-
-# type vars
-
-T = TypeVar("T")
-E = TypeVar("E", bound="Expression")
 
 # ast nodes
 
@@ -55,7 +50,8 @@ class AST(ABC, Hashable):
             setattr(self, name, value)
 
     def iter_fields(self):
-        for field in self.__dict__.keys():
+        fields = list(self.__dict__.keys())
+        for field in fields:
             if field not in self.location_fields:
                 try:
                     yield field, getattr(self, field)
@@ -114,8 +110,8 @@ class Subscript(AST):
         self.index = index
 
 
-class Tuple(AST, Generic[E]):
-    def __init__(self, values: Sequence[E]):
+class Tuple(AST):
+    def __init__(self, values: Sequence[Expression]):
         super().__init__()
         self.values = values
 
@@ -205,60 +201,75 @@ class ArrayType(AST):
 TypeSpecifier = Union[CollectionType, ArrayType, AtomicTypeName]
 
 
-class Assign(AST):
+class Add(AST):
     pass
 
 
-class ColonAssign(AST):
+class Sub(AST):
     pass
 
 
-class MultAssign(AST):
+class Mult(AST):
     pass
 
 
-class DivAssign(AST):
+class Div(AST):
     pass
 
 
-class ModAssign(AST):
+class Mod(AST):
     pass
 
 
-class AddAssign(AST):
-    pass
-
-
-class SubAssign(AST):
-    pass
-
-
-AssignOperator = Union[
-    Assign,
-    ColonAssign,
-    MultAssign,
-    DivAssign,
-    ModAssign,
-    AddAssign,
-    SubAssign,
+BinaryOperator = Union[
+    Add,
+    Sub,
+    Mult,
+    Div,
+    Mod,
 ]
 
 
-class Assignment(AST):
+class Colon(AST):
+    pass
+
+
+AugAssignOperator = Union[
+    Colon,
+    Mult,
+    Div,
+    Mod,
+    Add,
+    Sub,
+]
+
+
+class Assign(AST):
     def __init__(
         self,
         target: Identifier | Tuple[Identifier],
         value: Expression | Structure,
-        operator: AssignOperator | None,
         declaration_mode: DeclarationMode | None = None,
         type_specifier: TypeSpecifier | None = None,
     ):
         super().__init__()
         self.target = target
         self.value = value
-        self.operator = operator
         self.declaration_mode = declaration_mode
         self.type_specifier = type_specifier
+
+
+class AugAssign(AST):
+    def __init__(
+        self,
+        target: Identifier | Tuple[Identifier],
+        operator: AugAssignOperator,
+        value: Expression | Structure,
+    ):
+        super().__init__()
+        self.target = target
+        self.operator = operator
+        self.value = value
 
 
 class Parameter(AST):
@@ -355,18 +366,31 @@ class Continue(AST):
 class For(AST):
     def __init__(
         self,
-        body: Sequence[Statement],
         target: Identifier,
         initial_value: Expression,
-        final_value: Expression | None = None,
+        final_value: Expression,
+        body: Sequence[Statement],
         increment_value: Expression | None = None,
     ):
         super().__init__()
-        self.body = body
         self.target = target
         self.initial_value = initial_value
         self.final_value = final_value
+        self.body = body
         self.increment_value = increment_value
+
+
+class ForIn(AST):
+    def __init__(
+        self,
+        target: Identifier,
+        iterate_value: Expression,
+        body: Sequence[Statement],
+    ):
+        super().__init__()
+        self.target = target
+        self.iterate_value = iterate_value
+        self.body = body
 
 
 class While(AST):
@@ -394,7 +418,7 @@ Structure = Union[
 ]
 
 Statement = Union[
-    Assignment,
+    Assign,
     FunctionDef,
     Expr,
     Break,
@@ -435,35 +459,6 @@ class Boolean(AST):
         super().__init__()
         self.operator = operator
         self.values = values
-
-
-class Add(AST):
-    pass
-
-
-class Sub(AST):
-    pass
-
-
-class Mult(AST):
-    pass
-
-
-class Div(AST):
-    pass
-
-
-class Mod(AST):
-    pass
-
-
-BinaryOperator = Union[
-    Add,
-    Sub,
-    Mult,
-    Div,
-    Mod,
-]
 
 
 class Binary(AST):

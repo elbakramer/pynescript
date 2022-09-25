@@ -1,7 +1,5 @@
-import os
 import pathlib
 
-import click
 import requests
 import tqdm
 
@@ -26,14 +24,14 @@ def get_script(script_id_part, version):
     return result
 
 
-def dump_builtin_scripts(script_dir, encodig=None):
+def download_builtin_scripts(script_dir, encodig=None):
     script_dir = pathlib.Path(script_dir)
 
     if encodig is None:
         encoding = "utf-8"
 
-    if not os.path.exists(script_dir):
-        os.makedirs(script_dir, exist_ok=True)
+    if not script_dir.exists():
+        script_dir.mkdir(parents=True, exist_ok=True)
 
     script_name_replace_mapping = {
         " ": "_",
@@ -63,23 +61,3 @@ def dump_builtin_scripts(script_dir, encodig=None):
 
         with open(script_dir / script_filename, "w", encoding=encoding) as f:
             f.write(script_source)
-
-
-@click.group()
-def cli():
-    pass
-
-
-@cli.command(short_help="Dump builtin scripts.")
-@click.option(
-    "--script-dir",
-    type=click.Path(exists=False, file_okay=False, writable=True),
-    help="Diretory where scripts to be saved.",
-    required=True,
-)
-def dump(script_dir):
-    dump_builtin_scripts(script_dir)
-
-
-if __name__ == "__main__":
-    cli()

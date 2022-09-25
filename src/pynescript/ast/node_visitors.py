@@ -2,9 +2,8 @@ from contextlib import contextmanager
 from contextlib import nullcontext
 from enum import IntEnum
 from enum import auto
-from typing import TYPE_CHECKING
 
-from pynescript import ast
+from pynescript.ast import types as ast
 from pynescript.ast.helpers import iter_fields
 from pynescript.ast.types import AST
 
@@ -247,7 +246,7 @@ class Unparser(NodeVisitor):
             self.fill(f"//@version={node.version}")
         self.traverse(node.body)
 
-    def visit_Assignment(self, node: ast.Assignment):
+    def visit_Assign(self, node: ast.Assign):
         self.fill()
         if node.declaration_mode:
             self.traverse(node.declaration_mode)
@@ -259,9 +258,18 @@ class Unparser(NodeVisitor):
             self.write(node.target)
         else:
             self.traverse(node.target)
+        self.write(" = ")
+        self.traverse(node.value)
+
+    def visit_AugAssign(self, node: ast.AugAssign):
+        self.fill()
+        if isinstance(node.target, str):
+            self.write(node.target)
+        else:
+            self.traverse(node.target)
         self.write(" ")
         self.traverse(node.operator)
-        self.write(" ")
+        self.write("= ")
         self.traverse(node.value)
 
     def visit_Expr(self, node: ast.Expr):
@@ -353,17 +361,24 @@ class Unparser(NodeVisitor):
             self.write(node.target)
         else:
             self.traverse(node.target)
-        if node.final_value:
-            self.write(" = ")
-            self.traverse(node.initial_value)
-            self.write(" to ")
-            self.traverse(node.final_value)
-            if node.increment_value:
-                self.write(" by ")
-                self.traverse(node.increment_value)
+        self.write(" = ")
+        self.traverse(node.initial_value)
+        self.write(" to ")
+        self.traverse(node.final_value)
+        if node.increment_value:
+            self.write(" by ")
+            self.traverse(node.increment_value)
+        with self.block():
+            self.traverse(node.body)
+
+    def visit_ForIn(self, node: ast.ForIn):
+        self.write("for ")
+        if isinstance(node.target, str):
+            self.write(node.target)
         else:
-            self.write(" in ")
-            self.traverse(node.initial_value)
+            self.traverse(node.target)
+        self.write(" in ")
+        self.traverse(node.iterate_value)
         with self.block():
             self.traverse(node.body)
 
@@ -561,26 +576,8 @@ class Unparser(NodeVisitor):
     def visit_Or(self, node):
         self.write("or")
 
-    def visit_Assign(self, node):
-        self.write("=")
-
-    def visit_ColonAssign(self, node):
-        self.write(":=")
-
-    def visit_MultAssign(self, node):
-        self.write("*=")
-
-    def visit_DivAssign(self, node):
-        self.write("/=")
-
-    def visit_ModAssign(self, node):
-        self.write("%=")
-
-    def visit_AddAssign(self, node):
-        self.write("+=")
-
-    def visit_SubAssign(self, node):
-        self.write("-=")
+    def visit_Colon(self, node):
+        self.write(":")
 
     def visit_CollectionType(self, node: ast.CollectionType):
         self.traverse(node.type_name)

@@ -3,6 +3,6 @@
 ## pynescript
 
 ```{eval-rst}
-.. automodule:: pynescript
-   :members:
+.. toctree::
+    reference/pynescript.rst
 ```

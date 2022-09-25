@@ -230,6 +230,7 @@ def docs_build(session: Session) -> None:
     session.install("sphinx", "sphinx-click", "furo", "myst-parser")
 
     build_dir = Path("docs", "_build")
+
     if build_dir.exists():
         shutil.rmtree(build_dir)
 
@@ -239,12 +240,29 @@ def docs_build(session: Session) -> None:
 @session(python=python_versions[0])
 def docs(session: Session) -> None:
     """Build and serve the documentation with live reloading on file changes."""
-    args = session.posargs or ["--open-browser", "docs", "docs/_build"]
-
     session.install(".")
     session.install("sphinx", "sphinx-autobuild", "sphinx-click", "furo", "myst-parser")
 
+    apidoc_dir = Path("docs", "api")
+
+    if apidoc_dir.exists():
+        shutil.rmtree(apidoc_dir)
+
+    args = [
+        "--force",
+        "--separate",
+        "--ext-autodoc",
+        "--output-dir",
+        "docs/reference",
+        "src/pynescript",
+    ]
+
+    session.run("sphinx-apidoc", *args)
+
+    args = session.posargs or ["--open-browser", "docs", "docs/_build"]
+
     build_dir = Path("docs", "_build")
+
     if build_dir.exists():
         shutil.rmtree(build_dir)
 

@@ -4,7 +4,9 @@
 /.nox/
 /.python-version
 /.pytype/
+/.vscode/
 /dist/
 /docs/_build/
+/docs/reference/
 /src/*.egg-info/
 __pycache__/

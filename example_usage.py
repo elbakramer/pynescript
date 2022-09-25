@@ -1,18 +1,20 @@
-# Usage
-
-## Library
-
-Simple parse, dump, unparse
-
-```python
+import collections
 import tempfile
 
 from io import StringIO
 from pathlib import Path
 
+import numpy as np
+import pandas as pd
+
 from pynescript import ast
-from pynescript.ast import parse, parse_string, parse_file
-from pynescript.ast import dump, unparse
+from pynescript.ast import NodeTransformer
+from pynescript.ast import NodeVisitor
+from pynescript.ast import dump
+from pynescript.ast import parse
+from pynescript.ast import parse_file
+from pynescript.ast import parse_string
+from pynescript.ast import unparse
 
 SCRIPT = """
 //@version=5
@@ -70,16 +72,6 @@ print(tree_dumped)
 # unparse parsed tree to generate code
 unparsed_script = unparse(tree)
 print(unparsed_script)
-```
-
-Traversing and transforming parsed AST nodes
-
-```python
-from pynescript import ast
-from pynescript.ast import parse
-from pynescript.ast import NodeVisitor, NodeTransformer
-
-tree = parse_string(SCRIPT)
 
 # can process tree using NodeVisitor() and NodeTransformer()
 # implement visit_{NodeType}(node) method to capture node of type {NodeType}
@@ -267,12 +259,3 @@ class SimpleScriptExecutor(NodeTransformer):
 
 simple_script_executor = SimpleScriptExecutor()
 simple_script_executor.visit(tree)
-```
-
-## Cli
-
-```{eval-rst}
-.. click:: pynescript.__main__:cli
-    :prog: pynescript
-    :nested: full
-```
