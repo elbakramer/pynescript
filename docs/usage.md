@@ -76,7 +76,7 @@ Traversing and transforming parsed AST nodes
 
 ```python
 from pynescript import ast
-from pynescript.ast import parse
+from pynescript.ast import parse_string
 from pynescript.ast import NodeVisitor, NodeTransformer
 
 tree = parse_string(SCRIPT)

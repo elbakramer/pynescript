@@ -138,7 +138,7 @@ class XableMatchedPluginChecker(BaseChecker):
     ) -> bool:
         if is_basename:
             filepath = PurePath(filepath).name
-        return re.match(pattern, filepath) is not None
+        return re.search(pattern, filepath) is not None
 
     @classmethod
     def match_path(cls, pattern: str, filepath: str) -> bool:

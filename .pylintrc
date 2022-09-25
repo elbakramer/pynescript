@@ -162,8 +162,9 @@ disable=raw-checker-failed,
 enable=c-extension-no-member
 
 # Disable for paths
-disable-paths=plugins/pylint_*_plugin.py:invalid-name,missing-function-docstring
+disable-paths=plugins/pylint_*_plugin.py:invalid-name
               noxfile.py:redefined-outer-name
+              docs/conf.py:redefined-builtin
               example_usage.py:invalid-unary-operand-type
 
 # Disable for patterns
