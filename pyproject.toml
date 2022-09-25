@@ -51,6 +51,9 @@ myst-parser = ">=0.18.0"
 [tool.poetry.scripts]
 pynescript = "pynescript.__main__:cli"
 
+[tool.poetry.plugins."pygments.lexers"]
+pinescript = "pynescript.ext.pygments.lexers:PinescriptLexer"
+
 [tool.coverage.paths]
 source = ["src", "*/site-packages"]
 tests = ["tests", "*/tests"]

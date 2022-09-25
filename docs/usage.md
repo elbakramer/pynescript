@@ -162,34 +162,44 @@ class SimpleScriptExecutor(NodeTransformer):
             if kind == "long":
                 if self.pos_price > 0:
                     print(
-                        f"[{label}] tried opening {kind} position at price {price} but skipping due to open {kind} position, comment = {comment}"
+                        f"[{label}] tried opening {kind} position "
+                        f"at price {price} but skipping due to "
+                        f"open {kind} position, comment = {comment}"
                     )
                 elif self.pos_price == 0:
                     print(
-                        f"[{label}] opening {kind} position at price {price}, comment = {comment}"
+                        f"[{label}] opening {kind} position "
+                        f"at price {price}, comment = {comment}"
                     )
                     self.pos_price = price
                 else:
                     gain = price - self.pos_price
                     print(
-                        f"[{label}] closing short position at price {price} with gain {gain}, comment = {comment}"
+                        f"[{label}] closing short position "
+                        "at price {price} with gain {gain}, "
+                        f"comment = {comment}"
                     )
                     self.cash += gain
                     self.pos_price = 0
             else:
                 if self.pos_price < 0:
                     print(
-                        f"[{label}] tried opening {kind} position at price {price} but skipping due to open {kind} position, comment = {comment}"
+                        f"[{label}] tried opening {kind} position "
+                        f"at price {price} but skipping due to "
+                        f"open {kind} position, comment = {comment}"
                     )
                 elif self.pos_price == 0:
                     print(
-                        f"[{label}] opening {kind} position at price {price}, comment = {comment}"
+                        f"[{label}] opening {kind} position "
+                        f"at price {price}, comment = {comment}"
                     )
                     self.pos_price = -price
                 else:
                     gain = -self.pos_price - price
                     print(
-                        f"[{label}] closing long position at price {price} with gain {gain}, comment = {comment}"
+                        f"[{label}] closing long position "
+                        f"at price {price} with gain {gain}, "
+                        f"comment = {comment}"
                     )
                     self.cash += gain
                     self.pos_price = 0

@@ -25,7 +25,6 @@ TAB = Literal("\t")
 ENTER = Literal("\n")
 
 SLASH = Literal("/")
-BACKSLASH = Literal("\\")
 
 NEWLINE = LineEnd()
 EMPTY = Empty()
