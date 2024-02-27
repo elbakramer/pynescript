@@ -13,3 +13,24 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
+
+from __future__ import annotations
+
+from pynescript.ast.helper import iter_fields
+from pynescript.ast.node import AST
+
+
+class NodeVisitor:
+    def visit(self, node: AST):
+        method = "visit_" + node.__class__.__name__
+        visitor = getattr(self, method, self.generic_visit)
+        return visitor(node)
+
+    def generic_visit(self, node: AST):
+        for _field, value in iter_fields(node):
+            if isinstance(value, list):
+                for item in value:
+                    if isinstance(item, AST):
+                        self.visit(item)
+            elif isinstance(value, AST):
+                self.visit(value)

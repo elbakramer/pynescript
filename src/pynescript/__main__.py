@@ -1,4 +1,21 @@
-"""Command-line interface."""
+# Copyright 2024 Yunseong Hwang
+#
+# Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.gnu.org/licenses/lgpl-3.0.en.html
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
+from __future__ import annotations
+
 import click
 
 
@@ -34,10 +51,10 @@ def cli():
 )
 def parse_and_dump(filename, encoding, indent, output_file):
     from pynescript.ast import dump
-    from pynescript.ast import parse_file
+    from pynescript.ast import parse
 
     with click.open_file(filename, "r", encoding=encoding) as f:
-        script_node = parse_file(f, encoding=encoding)
+        script_node = parse(f.read(), filename)
 
     script_node_dump = dump(script_node, indent=indent)
 
@@ -64,11 +81,11 @@ def parse_and_dump(filename, encoding, indent, output_file):
     default="-",
 )
 def parse_and_unparse(filename, encoding, output_file):
-    from pynescript.ast import parse_file
+    from pynescript.ast import parse
     from pynescript.ast import unparse
 
     with click.open_file(filename, "r", encoding=encoding) as f:
-        script_node = parse_file(f, encoding=encoding)
+        script_node = parse(f.read(), filename)
 
     unparsed_script = unparse(script_node)
 
@@ -84,7 +101,7 @@ def parse_and_unparse(filename, encoding, output_file):
     required=True,
 )
 def download_builtin_scripts(script_dir):
-    from pynescript.utils.pine_facade import download_builtin_scripts as download
+    from pynescript.util.pine_facade import download_builtin_scripts as download
 
     download(script_dir)
 

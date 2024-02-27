@@ -1,201 +1,114 @@
-from typing import Iterable, Optional, Tuple
+# Copyright 2024 Yunseong Hwang
+#
+# Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.gnu.org/licenses/lgpl-3.0.en.html
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: LGPL-3.0-or-later
 
+from __future__ import annotations
+
+from typing import ClassVar
+
+from antlr4 import InputStream
+from antlr4 import Token as ANTLR4Token
 from pygments.lexer import Lexer
-from pygments.token import Token, _TokenType
+from pygments.token import Token
 
-from pyparsing import ParserElement, ParseResults, TokenConverter
-from pyparsing import Literal, Keyword, White, LineEnd
-from pyparsing import MatchFirst, And, OneOrMore, Combine, FollowedBy, SkipTo, Suppress
-from pyparsing import common
-
-from pynescript.ast.parser.tokens import (
-    INT,
-    FLOAT,
-    BOOL,
-    STRING,
-    COLOR,
-    LABEL,
-    LINE,
-    BOX,
-    LINEFILL,
-    TABLE,
-    ARRAY,
-    MATRIX,
-    CONST,
-    SIMPLE,
-    SERIES,
-    IF,
-    ELSE,
-    SWITCH,
-    FOR,
-    TO,
-    IN,
-    BY,
-    WHILE,
-    BREAK,
-    CONTINUE,
-    IMPORT,
-    AS,
-    EXPORT,
-    VAR,
-    VARIP,
-    TRUE,
-    FALSE,
-    NA,
-    AND,
-    NOT,
-    OR,
-    LITERAL_INT,
-    LITERAL_FLOAT,
-    LITERAL_BOOL,
-    LITERAL_COLOR,
-    LITERAL_STRING,
-    IDENTIFIER,
-    EQ,
-    NEQ,
-    LE,
-    LT,
-    GE,
-    GT,
-    ASSIGN,
-    MOD,
-    MUL,
-    ADD,
-    SUB,
-    DIV,
-    QUESTION,
-    COLON,
-    LBRACKET,
-    RBRACKET,
-    LPAREN,
-    RPAREN,
-    LCHEVRON,
-    RCHEVRON,
-    COMMA,
-    DOT,
-    RIGHT_DOUBLE_ARROW,
-    SLASH,
-)
-
-
-TokenUnprocessed = Tuple[int, _TokenType, str]
-
-
-class PyparsingToken(TokenConverter):
-    def __init__(self, expr: ParserElement, token: Optional[_TokenType] = None) -> None:
-        super().__init__(expr)
-        self.token = token
-
-    def postParse(self, instring: str, loc: int, tokenlist: ParseResults):
-        if self.token is None:
-            return []
-        if len(tokenlist) == 0:
-            return []
-        return [(loc, self.token, str(tokenlist[0]))]
+from pynescript.ast.grammar.antlr4.lexer import PinescriptLexer as PinescriptANTLR4Lexer
 
 
 class PinescriptLexer(Lexer):
-    name = "Pinescript Lexer"
-    aliases = "pinescript"
-    filenames = ["*.pine"]
+    name: ClassVar[str] = "Pinescript Lexer"
 
-    white_expr = PyparsingToken(White(), Token.Text.Whitespace)
-    version_comment_expr = And(
-        [
-            PyparsingToken(Literal("//"), Token.Comment),
-            PyparsingToken(Literal("@"), Token.Punctuation),
-            PyparsingToken(Keyword("version"), Token.Keyword),
-            PyparsingToken(Literal("="), Token.Punctuation),
-            PyparsingToken(common.integer("version"), Token.Literal.Number),
-            FollowedBy(LineEnd()),
-        ]
-    )
-    comment_expr = PyparsingToken(
-        Combine(Literal("//") + SkipTo(LineEnd())("comment")), Token.Comment
-    )
-    token_expr = MatchFirst(
-        [
-            PyparsingToken(INT, Token.Keyword),
-            PyparsingToken(FLOAT, Token.Keyword),
-            PyparsingToken(BOOL, Token.Keyword),
-            PyparsingToken(STRING, Token.Keyword),
-            PyparsingToken(COLOR, Token.Keyword),
-            PyparsingToken(LABEL, Token.Keyword),
-            PyparsingToken(LINE, Token.Keyword),
-            PyparsingToken(BOX, Token.Keyword),
-            PyparsingToken(LINEFILL, Token.Keyword),
-            PyparsingToken(TABLE, Token.Keyword),
-            PyparsingToken(ARRAY, Token.Keyword),
-            PyparsingToken(MATRIX, Token.Keyword),
-            PyparsingToken(CONST, Token.Keyword),
-            PyparsingToken(SIMPLE, Token.Keyword),
-            PyparsingToken(SERIES, Token.Keyword),
-            PyparsingToken(IF, Token.Keyword),
-            PyparsingToken(ELSE, Token.Keyword),
-            PyparsingToken(SWITCH, Token.Keyword),
-            PyparsingToken(FOR, Token.Keyword),
-            PyparsingToken(TO, Token.Keyword),
-            PyparsingToken(IN, Token.Keyword),
-            PyparsingToken(BY, Token.Keyword),
-            PyparsingToken(WHILE, Token.Keyword),
-            PyparsingToken(BREAK, Token.Keyword),
-            PyparsingToken(CONTINUE, Token.Keyword),
-            PyparsingToken(IMPORT, Token.Keyword),
-            PyparsingToken(AS, Token.Keyword),
-            PyparsingToken(EXPORT, Token.Keyword),
-            PyparsingToken(VAR, Token.Keyword),
-            PyparsingToken(VARIP, Token.Keyword),
-            PyparsingToken(TRUE, Token.Keyword),
-            PyparsingToken(FALSE, Token.Keyword),
-            PyparsingToken(NA, Token.Keyword),
-            PyparsingToken(AND, Token.Operator),
-            PyparsingToken(NOT, Token.Operator),
-            PyparsingToken(OR, Token.Operator),
-            PyparsingToken(LITERAL_INT, Token.Literal.Number),
-            PyparsingToken(LITERAL_FLOAT, Token.Literal.Number),
-            PyparsingToken(LITERAL_BOOL, Token.Literal),
-            PyparsingToken(LITERAL_COLOR, Token.Literal),
-            PyparsingToken(LITERAL_STRING, Token.Literal.String),
-            PyparsingToken(IDENTIFIER, Token.Name),
-            PyparsingToken(EQ, Token.Operator),
-            PyparsingToken(NEQ, Token.Operator),
-            PyparsingToken(LE, Token.Operator),
-            PyparsingToken(LT, Token.Operator),
-            PyparsingToken(GE, Token.Operator),
-            PyparsingToken(GT, Token.Operator),
-            PyparsingToken(ASSIGN, Token.Operator),
-            PyparsingToken(MOD, Token.Operator),
-            PyparsingToken(MUL, Token.Operator),
-            PyparsingToken(ADD, Token.Operator),
-            PyparsingToken(SUB, Token.Operator),
-            PyparsingToken(DIV, Token.Operator),
-            PyparsingToken(QUESTION, Token.Operator),
-            PyparsingToken(COLON, Token.Operator),
-            PyparsingToken(LBRACKET, Token.Punctuation),
-            PyparsingToken(RBRACKET, Token.Punctuation),
-            PyparsingToken(LPAREN, Token.Punctuation),
-            PyparsingToken(RPAREN, Token.Punctuation),
-            PyparsingToken(LCHEVRON, Token.Punctuation),
-            PyparsingToken(RCHEVRON, Token.Punctuation),
-            PyparsingToken(COMMA, Token.Punctuation),
-            PyparsingToken(DOT, Token.Punctuation),
-            PyparsingToken(RIGHT_DOUBLE_ARROW, Token.Punctuation),
-            PyparsingToken(SLASH, Token.Punctuation),
-        ]
-    )
-    expr = white_expr | version_comment_expr | comment_expr | token_expr
-    expr.leave_whitespace()
+    aliases: ClassVar[list[str]] = ["pinescript"]
+    filenames: ClassVar[list[str]] = ["*.pine"]
 
-    def get_tokens_unprocessed(self, text: str) -> Iterable[TokenUnprocessed]:
-        return OneOrMore(self.expr).parse_string(text, parse_all=True)
+    url: ClassVar[str] = "https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html"
 
-    @staticmethod
-    def analyze_text(text: str) -> float:
-        text_transformed = Suppress(PinescriptLexer.expr).transform_string(text)
-        len_text = len(text)
-        len_text_transformed = len(text_transformed)
-        if len_text > 0:
-            score = (len_text - len_text_transformed) / len_text
-        else:
-            score = 0.0
-        return score
+    _token_type_mapping: ClassVar[dict] = {
+        PinescriptANTLR4Lexer.AND: Token.Operator,
+        PinescriptANTLR4Lexer.AS: Token.Keyword,
+        PinescriptANTLR4Lexer.BREAK: Token.Keyword,
+        PinescriptANTLR4Lexer.BY: Token.Keyword,
+        PinescriptANTLR4Lexer.CONST: Token.Keyword,
+        PinescriptANTLR4Lexer.CONTINUE: Token.Keyword,
+        PinescriptANTLR4Lexer.ELSE: Token.Keyword,
+        PinescriptANTLR4Lexer.EXPORT: Token.Keyword,
+        PinescriptANTLR4Lexer.FALSE: Token.Literal,
+        PinescriptANTLR4Lexer.FOR: Token.Keyword,
+        PinescriptANTLR4Lexer.IF: Token.Keyword,
+        PinescriptANTLR4Lexer.IMPORT: Token.Keyword,
+        PinescriptANTLR4Lexer.IN: Token.Keyword,
+        PinescriptANTLR4Lexer.INPUT: Token.Keyword,
+        PinescriptANTLR4Lexer.METHOD: Token.Keyword,
+        PinescriptANTLR4Lexer.NOT: Token.Operator,
+        PinescriptANTLR4Lexer.OR: Token.Operator,
+        PinescriptANTLR4Lexer.SERIES: Token.Keyword,
+        PinescriptANTLR4Lexer.SIMPLE: Token.Keyword,
+        PinescriptANTLR4Lexer.SWITCH: Token.Keyword,
+        PinescriptANTLR4Lexer.TO: Token.Keyword,
+        PinescriptANTLR4Lexer.TYPE: Token.Keyword,
+        PinescriptANTLR4Lexer.TRUE: Token.Literal,
+        PinescriptANTLR4Lexer.VAR: Token.Keyword,
+        PinescriptANTLR4Lexer.VARIP: Token.Keyword,
+        PinescriptANTLR4Lexer.WHILE: Token.Keyword,
+        PinescriptANTLR4Lexer.WS: Token.Text.Whitespace,
+        PinescriptANTLR4Lexer.COMMENT: Token.Comment,
+        PinescriptANTLR4Lexer.LPAR: Token.Punctuation,
+        PinescriptANTLR4Lexer.RPAR: Token.Punctuation,
+        PinescriptANTLR4Lexer.LSQB: Token.Punctuation,
+        PinescriptANTLR4Lexer.RSQB: Token.Punctuation,
+        PinescriptANTLR4Lexer.LESS: Token.Operator,
+        PinescriptANTLR4Lexer.GREATER: Token.Operator,
+        PinescriptANTLR4Lexer.EQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.EQEQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.NOTEQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.LESSEQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.GREATEREQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.RARROW: Token.Punctuation,
+        PinescriptANTLR4Lexer.DOT: Token.Punctuation,
+        PinescriptANTLR4Lexer.COMMA: Token.Punctuation,
+        PinescriptANTLR4Lexer.COLON: Token.Operator,
+        PinescriptANTLR4Lexer.QUESTION: Token.Operator,
+        PinescriptANTLR4Lexer.PLUS: Token.Operator,
+        PinescriptANTLR4Lexer.MINUS: Token.Operator,
+        PinescriptANTLR4Lexer.STAR: Token.Operator,
+        PinescriptANTLR4Lexer.SLASH: Token.Operator,
+        PinescriptANTLR4Lexer.PERCENT: Token.Operator,
+        PinescriptANTLR4Lexer.PLUSEQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.MINEQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.STAREQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.SLASHEQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.PERCENTEQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.COLONEQUAL: Token.Operator,
+        PinescriptANTLR4Lexer.NAME: Token.Name,
+        PinescriptANTLR4Lexer.NUMBER: Token.Literal.Number,
+        PinescriptANTLR4Lexer.STRING: Token.Literal.String,
+        PinescriptANTLR4Lexer.COLOR: Token.Literal,
+        PinescriptANTLR4Lexer.NEWLINE: Token.Text.Whitespace,
+        PinescriptANTLR4Lexer.WS: Token.Text.Whitespace,
+        PinescriptANTLR4Lexer.COMMENT: Token.Comment,
+        PinescriptANTLR4Lexer.ERROR_TOKEN: Token.Error,
+    }
+
+    def get_tokens_unprocessed(self, text: str):
+        stream = InputStream(text)
+        lexer = PinescriptANTLR4Lexer(stream)
+        while True:
+            token = lexer.nextToken()
+            if token is None:
+                return
+            if token.type in {ANTLR4Token.EOF}:
+                return
+            if token.type in {PinescriptANTLR4Lexer.INDENT, PinescriptANTLR4Lexer.DEDENT}:
+                continue
+            yield token.start, self._token_type_mapping.get(token.type, Token.Other), token.text

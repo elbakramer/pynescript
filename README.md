@@ -9,17 +9,12 @@
 [![Tests](https://github.com/elbakramer/pynescript/workflows/Tests/badge.svg)][tests]
 [![Codecov](https://codecov.io/gh/elbakramer/pynescript/branch/main/graph/badge.svg)][codecov]
 
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)][pre-commit]
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)][black]
-
 [pypi_]: https://pypi.org/project/pynescript/
 [status]: https://pypi.org/project/pynescript/
 [python version]: https://pypi.org/project/pynescript
 [read the docs]: https://pynescript.readthedocs.io/
 [tests]: https://github.com/elbakramer/pynescript/actions?workflow=Tests
 [codecov]: https://app.codecov.io/gh/elbakramer/pynescript
-[pre-commit]: https://github.com/pre-commit/pre-commit
-[black]: https://github.com/psf/black
 
 ## Features
 
@@ -62,340 +57,163 @@ Script(
   body=[
     Expr(
       value=Call(
-        func=Name(
-          id='strategy',
-        ),
-        arguments=[
-          Argument(
-            value=Constant(
-              value='RSI Strategy',
-            ),
-            name=None,
-          ),
-          Argument(
-            value=Constant(
-              value=True,
-            ),
-            name='overlay',
-          ),
-        ],
-        type_argument=None,
-      ),
-    ),
+        func=Name(id='strategy', ctx=Load()),
+        args=[
+          Arg(
+            value=Constant(value='RSI Strategy')),
+          Arg(
+            value=Constant(value=True),
+            name='overlay')])),
     Assign(
-      target='length',
+      target=Name(id='length', ctx=Store()),
       value=Call(
-        func=Name(
-          id='input',
-        ),
-        arguments=[
-          Argument(
-            value=Constant(
-              value=14,
-            ),
-            name=None,
-          ),
-        ],
-        type_argument=None,
-      ),
-      declaration_mode=None,
-      type_specifier=None,
-    ),
+        func=Name(id='input', ctx=Load()),
+        args=[
+          Arg(
+            value=Constant(value=14))]),
+      annotations=[]),
     ...
 ```
 
 <details>
-    <summary>Full AST dump that is quote long...</summary>
+    <summary>Full AST dump that is quite long...</summary>
 
 ```python
 Script(
   body=[
     Expr(
       value=Call(
-        func=Name(
-          id='strategy',
-        ),
-        arguments=[
-          Argument(
-            value=Constant(
-              value='RSI Strategy',
-            ),
-            name=None,
-          ),
-          Argument(
-            value=Constant(
-              value=True,
-            ),
-            name='overlay',
-          ),
-        ],
-        type_argument=None,
-      ),
-    ),
+        func=Name(id='strategy', ctx=Load()),
+        args=[
+          Arg(
+            value=Constant(value='RSI Strategy')),
+          Arg(
+            value=Constant(value=True),
+            name='overlay')])),
     Assign(
-      target='length',
+      target=Name(id='length', ctx=Store()),
       value=Call(
-        func=Name(
-          id='input',
-        ),
-        arguments=[
-          Argument(
-            value=Constant(
-              value=14,
-            ),
-            name=None,
-          ),
-        ],
-        type_argument=None,
-      ),
-      declaration_mode=None,
-      type_specifier=None,
-    ),
+        func=Name(id='input', ctx=Load()),
+        args=[
+          Arg(
+            value=Constant(value=14))]),
+      annotations=[]),
     Assign(
-      target='overSold',
+      target=Name(id='overSold', ctx=Store()),
       value=Call(
-        func=Name(
-          id='input',
-        ),
-        arguments=[
-          Argument(
-            value=Constant(
-              value=30,
-            ),
-            name=None,
-          ),
-        ],
-        type_argument=None,
-      ),
-      declaration_mode=None,
-      type_specifier=None,
-    ),
+        func=Name(id='input', ctx=Load()),
+        args=[
+          Arg(
+            value=Constant(value=30))]),
+      annotations=[]),
     Assign(
-      target='overBought',
+      target=Name(id='overBought', ctx=Store()),
       value=Call(
-        func=Name(
-          id='input',
-        ),
-        arguments=[
-          Argument(
-            value=Constant(
-              value=70,
-            ),
-            name=None,
-          ),
-        ],
-        type_argument=None,
-      ),
-      declaration_mode=None,
-      type_specifier=None,
-    ),
+        func=Name(id='input', ctx=Load()),
+        args=[
+          Arg(
+            value=Constant(value=70))]),
+      annotations=[]),
     Assign(
-      target='price',
-      value=Name(
-        id='close',
-      ),
-      declaration_mode=None,
-      type_specifier=None,
-    ),
+      target=Name(id='price', ctx=Store()),
+      value=Name(id='close', ctx=Load()),
+      annotations=[]),
     Assign(
-      target='vrsi',
+      target=Name(id='vrsi', ctx=Store()),
       value=Call(
         func=Attribute(
-          value=Name(
-            id='ta',
-          ),
-          attribute='rsi',
-        ),
-        arguments=[
-          Argument(
-            value=Name(
-              id='price',
-            ),
-            name=None,
-          ),
-          Argument(
-            value=Name(
-              id='length',
-            ),
-            name=None,
-          ),
-        ],
-        type_argument=None,
-      ),
-      declaration_mode=None,
-      type_specifier=None,
-    ),
+          value=Name(id='ta', ctx=Load()),
+          attr='rsi',
+          ctx=Load()),
+        args=[
+          Arg(
+            value=Name(id='price', ctx=Load())),
+          Arg(
+            value=Name(id='length', ctx=Load()))]),
+      annotations=[]),
     Assign(
-      target='co',
+      target=Name(id='co', ctx=Store()),
       value=Call(
         func=Attribute(
-          value=Name(
-            id='ta',
-          ),
-          attribute='crossover',
-        ),
-        arguments=[
-          Argument(
-            value=Name(
-              id='vrsi',
-            ),
-            name=None,
-          ),
-          Argument(
-            value=Name(
-              id='overSold',
-            ),
-            name=None,
-          ),
-        ],
-        type_argument=None,
-      ),
-      declaration_mode=None,
-      type_specifier=None,
-    ),
+          value=Name(id='ta', ctx=Load()),
+          attr='crossover',
+          ctx=Load()),
+        args=[
+          Arg(
+            value=Name(id='vrsi', ctx=Load())),
+          Arg(
+            value=Name(id='overSold', ctx=Load()))]),
+      annotations=[]),
     Assign(
-      target='cu',
+      target=Name(id='cu', ctx=Store()),
       value=Call(
         func=Attribute(
-          value=Name(
-            id='ta',
-          ),
-          attribute='crossunder',
-        ),
-        arguments=[
-          Argument(
-            value=Name(
-              id='vrsi',
-            ),
-            name=None,
-          ),
-          Argument(
-            value=Name(
-              id='overBought',
-            ),
-            name=None,
-          ),
-        ],
-        type_argument=None,
-      ),
-      declaration_mode=None,
-      type_specifier=None,
-    ),
+          value=Name(id='ta', ctx=Load()),
+          attr='crossunder',
+          ctx=Load()),
+        args=[
+          Arg(
+            value=Name(id='vrsi', ctx=Load())),
+          Arg(
+            value=Name(id='overBought', ctx=Load()))]),
+      annotations=[]),
     Expr(
       value=If(
-        condition=Unary(
-          operator=Not(),
+        test=UnaryOp(
+          op=Not(),
           operand=Call(
-            func=Name(
-              id='na',
-            ),
-            arguments=[
-              Argument(
-                value=Name(
-                  id='vrsi',
-                ),
-                name=None,
-              ),
-            ],
-            type_argument=None,
-          ),
-        ),
+            func=Name(id='na', ctx=Load()),
+            args=[
+              Arg(
+                value=Name(id='vrsi', ctx=Load()))])),
         body=[
           Expr(
             value=If(
-              condition=Name(
-                id='co',
-              ),
+              test=Name(id='co', ctx=Load()),
               body=[
                 Expr(
                   value=Call(
                     func=Attribute(
-                      value=Name(
-                        id='strategy',
-                      ),
-                      attribute='entry',
-                    ),
-                    arguments=[
-                      Argument(
-                        value=Constant(
-                          value='RsiLE',
-                        ),
-                        name=None,
-                      ),
-                      Argument(
+                      value=Name(id='strategy', ctx=Load()),
+                      attr='entry',
+                      ctx=Load()),
+                    args=[
+                      Arg(
+                        value=Constant(value='RsiLE')),
+                      Arg(
                         value=Attribute(
-                          value=Name(
-                            id='strategy',
-                          ),
-                          attribute='long',
-                        ),
-                        name=None,
-                      ),
-                      Argument(
-                        value=Constant(
-                          value='RsiLE',
-                        ),
-                        name='comment',
-                      ),
-                    ],
-                    type_argument=None,
-                  ),
-                ),
-              ],
-              orelse=None,
-            ),
-          ),
+                          value=Name(id='strategy', ctx=Load()),
+                          attr='long',
+                          ctx=Load())),
+                      Arg(
+                        value=Constant(value='RsiLE'),
+                        name='comment')]))],
+              orelse=[])),
           Expr(
             value=If(
-              condition=Name(
-                id='cu',
-              ),
+              test=Name(id='cu', ctx=Load()),
               body=[
                 Expr(
                   value=Call(
                     func=Attribute(
-                      value=Name(
-                        id='strategy',
-                      ),
-                      attribute='entry',
-                    ),
-                    arguments=[
-                      Argument(
-                        value=Constant(
-                          value='RsiSE',
-                        ),
-                        name=None,
-                      ),
-                      Argument(
+                      value=Name(id='strategy', ctx=Load()),
+                      attr='entry',
+                      ctx=Load()),
+                    args=[
+                      Arg(
+                        value=Constant(value='RsiSE')),
+                      Arg(
                         value=Attribute(
-                          value=Name(
-                            id='strategy',
-                          ),
-                          attribute='short',
-                        ),
-                        name=None,
-                      ),
-                      Argument(
-                        value=Constant(
-                          value='RsiSE',
-                        ),
-                        name='comment',
-                      ),
-                    ],
-                    type_argument=None,
-                  ),
-                ),
-              ],
-              orelse=None,
-            ),
-          ),
-        ],
-        orelse=None,
-      ),
-    ),
-  ],
-  version=5,
-)
+                          value=Name(id='strategy', ctx=Load()),
+                          attr='short',
+                          ctx=Load())),
+                      Arg(
+                        value=Constant(value='RsiSE'),
+                        name='comment')]))],
+              orelse=[]))],
+        orelse=[]))],
+  annotations=[
+    '//@version=5'])
 ```
 
 </details>
@@ -425,13 +243,9 @@ if not na(vrsi)
         strategy.entry("RsiSE", strategy.short, comment="RsiSE")
 ```
 
-## Future Plans
-
--   [Tradingview]-less standalone local back-testing and live-trading using [NautilusTrader]
-
 ## Requirements
 
--   Python 3.8 or higher
+-   Python 3.10 or higher
 
 ## Installation
 
@@ -445,13 +259,6 @@ $ pip install pynescript
 
 Please see the [Usage][usage] for details.
 
-Also check out [example_usage.py][example usage] script for examples.
-
-## Contributing
-
-Contributions are very welcome.
-To learn more, see the [Contributor Guide].
-
 ## License
 
 Distributed under the terms of the [LGPL 3.0 license][license],
@@ -462,23 +269,15 @@ _Pynescript_ is free and open source software.
 If you encounter any problems,
 please [file an issue] along with a detailed description.
 
-## Credits
-
-This project was generated from [@cjolowicz]'s [Hypermodern Python Cookiecutter] template.
-
-[@cjolowicz]: https://github.com/cjolowicz
-[pypi]: https://pypi.org/
-[hypermodern python cookiecutter]: https://github.com/cjolowicz/cookiecutter-hypermodern-python
-[file an issue]: https://github.com/elbakramer/pynescript/issues
-[pip]: https://pip.pypa.io/
 [pinescript]: https://www.tradingview.com/pine-script-docs/en/v5/Introduction.html
 [python]: https://www.python.org/
-[tradingview]: https://tradingview.com/
-[nautilustrader]: https://github.com/nautechsystems/nautilus_trader
-[example usage]: https://github.com/elbakramer/pynescript/blob/main/example_usage.py
+
+[pip]: https://pip.pypa.io/
+[pypi]: https://pypi.org/
+
+[file an issue]: https://github.com/elbakramer/pynescript/issues
 
 <!-- github-only -->
 
 [license]: https://github.com/elbakramer/pynescript/blob/main/LICENSE
-[contributor guide]: https://github.com/elbakramer/pynescript/blob/main/CONTRIBUTING.md
 [usage]: https://pynescript.readthedocs.io/en/latest/usage.html

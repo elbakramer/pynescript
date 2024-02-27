@@ -13,3 +13,21 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
+
+from __future__ import annotations
+
+from itertools import zip_longest
+
+
+def grouper(iterable, n, *, incomplete="fill", fillvalue=None):
+    args = [iter(iterable)] * n
+    match incomplete:
+        case "fill":
+            return zip_longest(*args, fillvalue=fillvalue)
+        case "strict":
+            return zip(*args, strict=True)
+        case "ignore":
+            return zip(*args, strict=False)
+        case _:
+            msg = "Expected fill, strict, or ignore"
+            raise ValueError(msg)

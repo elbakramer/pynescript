@@ -13,3 +13,7 @@
 # limitations under the License.
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
+
+from __future__ import annotations
+
+from .generated import *  # noqa: F403

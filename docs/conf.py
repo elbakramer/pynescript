@@ -1,4 +1,5 @@
-"""Sphinx configuration."""
+from __future__ import annotations
+
 import shutil
 
 from pathlib import Path
@@ -9,7 +10,7 @@ from sphinx.ext.apidoc import main as sphinx_apidoc_main
 
 project = "Pynescript"
 author = "Yunseong Hwang"
-copyright = "2022, Yunseong Hwang"
+copyright = "2024, Yunseong Hwang"  # noqa: A001
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
