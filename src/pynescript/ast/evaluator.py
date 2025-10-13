@@ -83,6 +83,24 @@ class NodeLiteralEvaluator(NodeVisitor):
                 return False
         return True
 
+    def visit_Eq(self, _node: ast.Eq):
+        return operator.eq
+
+    def visit_NotEq(self, _node: ast.NotEq):
+        return operator.ne
+
+    def visit_Lt(self, _node: ast.Lt):
+        return operator.lt
+
+    def visit_LtE(self, _node: ast.LtE):
+        return operator.le
+
+    def visit_Gt(self, _node: ast.Gt):
+        return operator.gt
+
+    def visit_GtE(self, _node: ast.GtE):
+        return operator.ge
+
     def visit_Constant(self, node: ast.Constant):
         if node.kind:
             msg = f"unexpected constant kind: {node.kind!s}"
