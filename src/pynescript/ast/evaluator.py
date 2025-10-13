@@ -322,6 +322,83 @@ class NodeLiteralEvaluator(NodeVisitor):
                     else self._error("ta.lowest takes series and period")
                 )
             ),
+            "ta.range": (
+                lambda: (
+                    max(args[0][-args[1]:]) - min(args[0][-args[1]:])
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                    )
+                    else self._error("ta.range takes series and period")
+                )
+            ),
+            "ta.wma": (
+                lambda: self._wma(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.wma takes series and period")
+            ),
+            "ta.bb": (
+                lambda: self._bollinger_bands(args[0], args[1], args[2])
+                if (
+                    len(args) == 3
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                    and isinstance(args[2], (int, float))
+                )
+                else self._error("ta.bb takes series, period, and multiplier")
+            ),
+            "ta.crossover": (
+                lambda: (
+                    args[0][-1] > args[1][-1] and args[0][-2] <= args[1][-2]
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], (list, int, float))
+                        and len(args[0]) >= 2
+                    )
+                    else self._error("ta.crossover takes two series")
+                )
+            ),
+            "ta.crossunder": (
+                lambda: (
+                    args[0][-1] < args[1][-1] and args[0][-2] >= args[1][-2]
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], (list, int, float))
+                        and len(args[0]) >= 2
+                    )
+                    else self._error("ta.crossunder takes two series")
+                )
+            ),
+            "na": lambda: None,
+            "nz": (
+                lambda: args[1] if args[0] is None else args[0]
+                if len(args) == 2
+                else args[0] if args[0] is not None else 0
+                if len(args) == 1
+                else self._error("nz takes 1 or 2 arguments")
+            ),
+            "bool": (
+                lambda: bool(args[0])
+                if len(args) == 1
+                else self._error("bool takes one argument")
+            ),
+            "int": (
+                lambda: int(args[0])
+                if len(args) == 1
+                else self._error("int takes one argument")
+            ),
+            "float": (
+                lambda: float(args[0])
+                if len(args) == 1
+                else self._error("float takes one argument")
+            ),
         }
         if name in builtins:
             return builtins[name]()
@@ -356,6 +433,26 @@ class NodeLiteralEvaluator(NodeVisitor):
         rs = avg_gain / avg_loss
         rsi = 100 - (100 / (1 + rs))
         return rsi
+
+    def _wma(self, series: list, period: int) -> float:
+        """Calculate Weighted Moving Average."""
+        if len(series) < period:
+            return 0.0
+        data = series[-period:]
+        weights = list(range(1, period + 1))
+        weighted_sum = sum(d * w for d, w in zip(data, weights, strict=True))
+        return weighted_sum / sum(weights)
+
+    def _bollinger_bands(self, series: list, period: int, mult: float):
+        """Calculate Bollinger Bands (middle, upper, lower)."""
+        if len(series) < period:
+            return [0.0, 0.0, 0.0]
+        data = series[-period:]
+        middle = statistics.mean(data)
+        std = statistics.stdev(data) if len(data) > 1 else 0.0
+        upper = middle + (mult * std)
+        lower = middle - (mult * std)
+        return [middle, upper, lower]
 
     def generic_visit(self, node: ast.AST):
         msg = f"unexpected type of node: {type(node)}"
