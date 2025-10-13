@@ -19,6 +19,7 @@ from __future__ import annotations
 import itertools
 import math
 import operator
+import statistics
 
 from typing import Any
 
@@ -246,6 +247,81 @@ class NodeLiteralEvaluator(NodeVisitor):
                 if len(args) == 1
                 else self._error("color.new takes one argument")
             ),
+            "ta.sma": (
+                lambda: (
+                    statistics.mean(args[0][-args[1]:])
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                    )
+                    else self._error("ta.sma takes series and period")
+                )
+            ),
+            "ta.ema": (
+                lambda: self._ema(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.ema takes series and period")
+            ),
+            "ta.rsi": (
+                lambda: self._rsi(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.rsi takes series and period")
+            ),
+            "ta.stdev": (
+                lambda: (
+                    statistics.stdev(args[0][-args[1]:])
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                        and len(args[0][-args[1]:]) > 1
+                    )
+                    else self._error("ta.stdev takes series and period")
+                )
+            ),
+            "ta.change": (
+                lambda: (
+                    args[0][-1] - args[0][-args[1]-1]
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                        and len(args[0]) > args[1]
+                    )
+                    else self._error("ta.change takes series and period")
+                )
+            ),
+            "ta.highest": (
+                lambda: (
+                    max(args[0][-args[1]:])
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                    )
+                    else self._error("ta.highest takes series and period")
+                )
+            ),
+            "ta.lowest": (
+                lambda: (
+                    min(args[0][-args[1]:])
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                    )
+                    else self._error("ta.lowest takes series and period")
+                )
+            ),
         }
         if name in builtins:
             return builtins[name]()
@@ -255,6 +331,31 @@ class NodeLiteralEvaluator(NodeVisitor):
 
     def _error(self, msg: str):
         raise ValueError(msg)
+
+    def _ema(self, series: list, period: int) -> float:
+        """Calculate Exponential Moving Average."""
+        if not series or period <= 0:
+            return 0.0
+        multiplier = 2 / (period + 1)
+        ema = series[0] if len(series) > 0 else 0.0
+        for price in series[1:]:
+            ema = (price * multiplier) + (ema * (1 - multiplier))
+        return ema
+
+    def _rsi(self, series: list, period: int) -> float:
+        """Calculate Relative Strength Index."""
+        if len(series) < period + 1:
+            return 50.0
+        changes = [series[i] - series[i-1] for i in range(1, len(series))]
+        gains = [max(c, 0) for c in changes[-period:]]
+        losses = [abs(min(c, 0)) for c in changes[-period:]]
+        avg_gain = sum(gains) / period
+        avg_loss = sum(losses) / period
+        if avg_loss == 0:
+            return 100.0
+        rs = avg_gain / avg_loss
+        rsi = 100 - (100 / (1 + rs))
+        return rsi
 
     def generic_visit(self, node: ast.AST):
         msg = f"unexpected type of node: {type(node)}"
