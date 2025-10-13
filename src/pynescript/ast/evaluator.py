@@ -191,6 +191,24 @@ class NodeLiteralEvaluator(NodeVisitor):
                 if len(args) == 1 and isinstance(args[0], str)
                 else self._error("str.lower takes exactly one string argument")
             ),
+            "str.contains": (
+                lambda: args[1] in args[0]
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], str)
+                    and isinstance(args[1], str)
+                )
+                else self._error("str.contains takes two string arguments")
+            ),
+            "str.startswith": (
+                lambda: args[0].startswith(args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], str)
+                    and isinstance(args[1], str)
+                )
+                else self._error("str.startswith takes two string arguments")
+            ),
             "str.substring": (
                 lambda: (
                     args[0][args[1]:]
@@ -222,6 +240,11 @@ class NodeLiteralEvaluator(NodeVisitor):
                     and isinstance(args[1], int)
                 )
                 else self._error("array.get takes array and index")
+            ),
+            "color.new": (
+                lambda: f"color({args[0]})"
+                if len(args) == 1
+                else self._error("color.new takes one argument")
             ),
         }
         if name in builtins:
