@@ -88,8 +88,8 @@ class NodeLiteralEvaluator(NodeVisitor):
             raise ValueError(msg)
         return node.value
 
-    def visit_Tuple(self, node: ast.Tuple):
-        return tuple(self.visit(elt) for elt in node.elts)
+    def visit_Tuple(self, node: ast.Tuple) -> Any:
+        return [self.visit(elt) for elt in node.elts]
 
     def visit_Call(self, node: ast.Call):
         func = self.visit(node.func)
@@ -209,6 +209,20 @@ class NodeLiteralEvaluator(NodeVisitor):
                     else self._error("str.substring takes string and 1-2 ints")
                 )
             ),
+            "array.size": (
+                lambda: len(args[0])
+                if len(args) == 1 and isinstance(args[0], list)
+                else self._error("array.size takes exactly one array argument")
+            ),
+            "array.get": (
+                lambda: args[0][args[1]]
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("array.get takes array and index")
+            ),
         }
         if name in builtins:
             return builtins[name]()
@@ -228,3 +242,14 @@ class NodeLiteralEvaluator(NodeVisitor):
 
     def visit_Attribute(self, node: ast.Attribute) -> Any:
         return f"{self.visit(node.value)}.{node.attr}"
+
+    def visit_Subscript(self, node: ast.Subscript) -> Any:
+        value = self.visit(node.value)
+        slice_ = self.visit(node.slice)
+        if isinstance(value, list) and isinstance(slice_, int):
+            return value[slice_]
+        else:
+            value_type = type(value)
+            slice_type = type(slice_)
+            msg = f"Subscript not supported for {value_type} with {slice_type}"
+            raise NotImplementedError(msg)
