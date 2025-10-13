@@ -1061,11 +1061,51 @@ This document tracks the implementation status of PineScript v6 features in pyne
 ## Current Implementation Status
 
 - **Parser**: ~90% complete (basic syntax parsing)
-- **Evaluator**: ~30% complete (expressions + function calls)
-- **Built-in Functions**: ~5% complete (basic math/string/array functions)
+- **Evaluator**: ~50% complete (expressions, functions, comparisons, conditionals)
+- **Built-in Functions**: ~10% complete (30+ math/string/array/TA functions)
 - **Types**: ~50% complete (basic types)
-- **Collections**: 0% complete
+- **Collections**: ~20% complete (arrays/tuples basic support)
 - **Drawing**: 0% complete
 - **Strategy**: 0% complete
 
-**Overall**: ~20-30% complete
+**Overall**: ~35-40% complete
+
+### Recently Implemented (Evaluator)
+
+#### Math Functions (11)
+- math.max, math.min, math.abs, math.sqrt
+- math.round, math.floor, math.ceil
+- math.pow, math.log
+- math.sin, math.cos, math.tan
+
+#### String Functions (6)
+- str.length, str.upper, str.lower
+- str.contains, str.startswith, str.substring
+
+#### Array Functions (2)
+- array.size, array.get
+
+#### Technical Analysis Functions (11)
+- ta.sma (Simple Moving Average)
+- ta.ema (Exponential Moving Average)
+- ta.wma (Weighted Moving Average)
+- ta.rsi (Relative Strength Index)
+- ta.stdev (Standard Deviation)
+- ta.bb (Bollinger Bands)
+- ta.highest, ta.lowest, ta.range
+- ta.change
+- ta.crossover, ta.crossunder
+
+#### Utility Functions (6)
+- na() - returns None
+- nz() - null coalescing
+- bool(), int(), float() - type conversions
+- color.new() - color creation
+
+#### Operators & Control Flow
+- All arithmetic operators: +, -, *, /, %
+- All comparison operators: ==, !=, <, <=, >, >=
+- Boolean operators: and, or, not
+- Conditional expressions: ? :
+- Array indexing: [index]
+- Attribute access: obj.attr
