@@ -17,7 +17,10 @@
 from __future__ import annotations
 
 import itertools
+import math
 import operator
+
+from typing import Any
 
 from pynescript.ast import node as ast
 from pynescript.ast.visitor import NodeVisitor
@@ -35,18 +38,21 @@ class NodeLiteralEvaluator(NodeVisitor):
         raise ValueError(msg)
 
     def visit_BinOp(self, node: ast.BinOp):
+        left = self.visit(node.left)
+        right = self.visit(node.right)
         if isinstance(node.op, ast.Add):
-            return operator.add(self.visit(node.left), self.visit(node.right))
-        if isinstance(node.op, ast.Sub):
-            return operator.sub(self.visit(node.left), self.visit(node.right))
-        if isinstance(node.op, ast.Mult):
-            return operator.mul(self.visit(node.left), self.visit(node.right))
-        if isinstance(node.op, ast.Div):
-            return operator.truediv(self.visit(node.left), self.visit(node.right))
-        if isinstance(node.op, ast.Mod):
-            return operator.mod(self.visit(node.left), self.visit(node.right))
-        msg = f"unexpected node operator: {node.op}"
-        raise ValueError(msg)
+            return operator.add(left, right)
+        elif isinstance(node.op, ast.Sub):
+            return operator.sub(left, right)
+        elif isinstance(node.op, ast.Mult):
+            return operator.mul(left, right)
+        elif isinstance(node.op, ast.Div):
+            return operator.truediv(left, right)
+        elif isinstance(node.op, ast.Mod):
+            return operator.mod(left, right)
+        else:
+            msg = f"Unsupported binary operator: {type(node.op)}"
+            raise NotImplementedError(msg)
 
     def visit_UnaryOp(self, node: ast.UnaryOp):
         if isinstance(node.op, ast.Not):
@@ -58,36 +64,22 @@ class NodeLiteralEvaluator(NodeVisitor):
         msg = f"unexpected node operator: {node.op}"
         raise ValueError(msg)
 
-    def visit_Conditional(self, node: ast.Conditional):
-        return self.visit(node.body) if self.visit(node.test) else self.visit(node.orelse)
+    def visit_Conditional(self, node: ast.Conditional) -> Any:
+        test_result = self.visit(node.test)
+        if test_result:
+            return self.visit(node.body)
+        else:
+            return self.visit(node.orelse)
 
-    def visit_Compare(self, node: ast.Compare):  # noqa: C901, PLR0911, PLR0912
-        left = self.visit(node.left)
-        comparators = map(self.visit, itertools.chain([node.left], node.comparators))
-        comparator_pairs = itertools.pairwise(comparators)
-        compare_ops = map(self.visit, node.ops)
-        for op, (left, right) in zip(compare_ops, comparator_pairs, strict=True):
-            if isinstance(op, ast.Eq):
-                if not operator.eq(left, right):
-                    return False
-            elif isinstance(op, ast.NotEq):
-                if not operator.ne(left, right):
-                    return False
-            elif isinstance(op, ast.Lt):
-                if not operator.lt(left, right):
-                    return False
-            elif isinstance(op, ast.LtE):
-                if not operator.le(left, right):
-                    return False
-            elif isinstance(op, ast.Gt):
-                if not operator.gt(left, right):
-                    return False
-            elif isinstance(op, ast.GtE):
-                if not operator.ge(left, right):
-                    return False
-            else:
-                msg = f"unexpected node operator: {op}"
-                raise ValueError(msg)
+    def visit_Compare(self, node: ast.Compare) -> Any:
+        comparator_list = [node.left, *node.comparators]
+        comparators = map(self.visit, comparator_list)
+        compare_ops = [self.visit(op) for op in node.ops]
+        comparator_pairs = list(itertools.pairwise(comparators))
+        pairs = zip(compare_ops, comparator_pairs, strict=True)
+        for op, (left, right) in pairs:
+            if not op(left, right):
+                return False
         return True
 
     def visit_Constant(self, node: ast.Constant):
@@ -99,6 +91,140 @@ class NodeLiteralEvaluator(NodeVisitor):
     def visit_Tuple(self, node: ast.Tuple):
         return tuple(self.visit(elt) for elt in node.elts)
 
+    def visit_Call(self, node: ast.Call):
+        func = self.visit(node.func)
+        args = []
+
+        kwargs = {}
+
+        for arg in node.args:
+
+            if arg.name:
+
+                kwargs[arg.name] = self.visit(arg.value)
+
+            else:
+
+                args.append(self.visit(arg.value))
+
+        # Handle built-in functions
+        if isinstance(func, str):
+            return self._call_builtin(func, args)
+        else:
+            # For now, assume func is callable
+            return func(*args, **kwargs)
+
+    def _call_builtin(self, name: str, args):
+        builtins = {
+            "math.max": lambda: max(args),
+            "math.min": lambda: min(args),
+            "math.abs": (
+                lambda: abs(args[0])
+                if len(args) == 1
+                else self._error("math.abs takes exactly one argument")
+            ),
+            "math.sqrt": (
+                lambda: math.sqrt(args[0])
+                if len(args) == 1
+                else self._error("math.sqrt takes exactly one argument")
+            ),
+            "math.round": (
+                lambda: (
+                    round(args[0])
+                    if len(args) == 1
+                    else round(args[0], args[1])
+                    if len(args) == 2
+                    else self._error("math.round takes one or two arguments")
+                )
+            ),
+            "math.floor": (
+                lambda: math.floor(args[0])
+                if len(args) == 1
+                else self._error("math.floor takes exactly one argument")
+            ),
+            "math.ceil": (
+                lambda: math.ceil(args[0])
+                if len(args) == 1
+                else self._error("math.ceil takes exactly one argument")
+            ),
+            "math.pow": (
+                lambda: math.pow(args[0], args[1])
+                if len(args) == 2
+                else self._error("math.pow takes exactly two arguments")
+            ),
+            "math.log": (
+                lambda: (
+                    math.log(args[0])
+                    if len(args) == 1
+                    else math.log(args[0], args[1])
+                    if len(args) == 2
+                    else self._error("math.log takes one or two arguments")
+                )
+            ),
+            "math.sin": (
+                lambda: math.sin(args[0])
+                if len(args) == 1
+                else self._error("math.sin takes exactly one argument")
+            ),
+            "math.cos": (
+                lambda: math.cos(args[0])
+                if len(args) == 1
+                else self._error("math.cos takes exactly one argument")
+            ),
+            "math.tan": (
+                lambda: math.tan(args[0])
+                if len(args) == 1
+                else self._error("math.tan takes exactly one argument")
+            ),
+            "str.length": (
+                lambda: len(args[0])
+                if len(args) == 1 and isinstance(args[0], str)
+                else self._error("str.length takes exactly one string argument")
+            ),
+            "str.upper": (
+                lambda: args[0].upper()
+                if len(args) == 1 and isinstance(args[0], str)
+                else self._error("str.upper takes exactly one string argument")
+            ),
+            "str.lower": (
+                lambda: args[0].lower()
+                if len(args) == 1 and isinstance(args[0], str)
+                else self._error("str.lower takes exactly one string argument")
+            ),
+            "str.substring": (
+                lambda: (
+                    args[0][args[1]:]
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], str)
+                        and isinstance(args[1], int)
+                    )
+                    else args[0][args[1]:args[2]]
+                    if (
+                        len(args) == 3
+                        and isinstance(args[0], str)
+                        and isinstance(args[1], int)
+                        and isinstance(args[2], int)
+                    )
+                    else self._error("str.substring takes string and 1-2 ints")
+                )
+            ),
+        }
+        if name in builtins:
+            return builtins[name]()
+        else:
+            msg = f"Unknown built-in function: {name}"
+            raise ValueError(msg)
+
+    def _error(self, msg: str):
+        raise ValueError(msg)
+
     def generic_visit(self, node: ast.AST):
         msg = f"unexpected type of node: {type(node)}"
         raise ValueError(msg)
+
+    def visit_Name(self, node: ast.Name) -> Any:
+        return node.id
+
+    def visit_Attribute(self, node: ast.Attribute) -> Any:
+        return f"{self.visit(node.value)}.{node.attr}"
