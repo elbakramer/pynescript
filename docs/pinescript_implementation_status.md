@@ -1061,8 +1061,8 @@ This document tracks the implementation status of PineScript v6 features in pyne
 ## Current Implementation Status
 
 - **Parser**: ~90% complete (basic syntax parsing)
-- **Evaluator**: ~10% complete (basic expressions only)
-- **Built-in Functions**: 0% complete
+- **Evaluator**: ~30% complete (expressions + function calls)
+- **Built-in Functions**: ~5% complete (basic math/string/array functions)
 - **Types**: ~50% complete (basic types)
 - **Collections**: 0% complete
 - **Drawing**: 0% complete
