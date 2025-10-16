@@ -58,7 +58,7 @@ class PinescriptCommentParser:
 
     _ASSIGNMENT_ANNOTATION_PATTERN = re.compile(r"^(//)(\s*)(@)(\s*)(version)(\s*)(=)(\s*)(.+)$")
     _SIMPLE_ANNOTATION_PATTERN = re.compile(
-        r"^(//)(\s*)(@)(\s*)(description|fuction|returns|type|variable|strategy_alert_message)(\s+)(.+)$"
+        r"^(//)(\s*)(@)(\s*)(description|function|returns|type|variable|strategy_alert_message)(\s+)(.+)$"
     )
     _NAMED_ANNOTATION_PATTERN = re.compile(r"^(//)(\s*)(@)(\s*)(param|field)(\s+)(\w+)(\s+)(.+)$")
     _REGION_BORDER_PATTERN = re.compile(r"^(//)(\s*)(#)(\s*)(region|endregion)$")
@@ -81,7 +81,7 @@ class PinescriptCommentParser:
                 kind += "F"
             elif parts[0] in {"type"}:
                 kind += "T"
-            elif parts[0] in {"varaible"}:
+            elif parts[0] in {"variable"}:
                 kind += "V"
             return kind, parts
         m = self._NAMED_ANNOTATION_PATTERN.match(comment)

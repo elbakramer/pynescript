@@ -523,29 +523,29 @@ This document tracks the implementation status of PineScript v6 features in pyne
 ## Functions
 
 ### Array Functions
-- ❌ array.abs
-- ❌ array.avg
+- ✅ array.abs
+- ✅ array.avg
 - ❌ array.binary_search
 - ❌ array.binary_search_leftmost
 - ❌ array.binary_search_rightmost
 - ❌ array.clear
-- ❌ array.concat
-- ❌ array.copy
+- ✅ array.concat
+- ✅ array.copy
 - ❌ array.covariance
-- ❌ array.every
-- ❌ array.fill
-- ❌ array.first
-- ❌ array.from
-- ❌ array.get
-- ❌ array.includes
-- ❌ array.indexof
-- ❌ array.insert
-- ❌ array.join
-- ❌ array.last
-- ❌ array.lastindexof
-- ❌ array.max
+- ✅ array.every
+- ✅ array.fill
+- ✅ array.first
+- ✅ array.from
+- ✅ array.get
+- ✅ array.includes
+- ✅ array.indexof
+- ✅ array.insert
+- ✅ array.join
+- ✅ array.last
+- ✅ array.lastindexof
+- ✅ array.max
 - ❌ array.median
-- ❌ array.min
+- ✅ array.min
 - ❌ array.mode
 - ❌ array.new_bool
 - ❌ array.new_box
@@ -561,22 +561,22 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ❌ array.percentile_linear_interpolation
 - ❌ array.percentile_nearest_rank
 - ❌ array.percentrank
-- ❌ array.pop
-- ❌ array.push
-- ❌ array.range
-- ❌ array.remove
-- ❌ array.reverse
-- ❌ array.set
-- ❌ array.shift
-- ❌ array.size
-- ❌ array.slice
-- ❌ array.some
-- ❌ array.sort
+- ✅ array.pop
+- ✅ array.push
+- ✅ array.range
+- ✅ array.remove
+- ✅ array.reverse
+- ✅ array.set
+- ✅ array.shift
+- ✅ array.size
+- ✅ array.slice
+- ✅ array.some
+- ✅ array.sort
 - ❌ array.sort_indices
 - ❌ array.standardize
 - ❌ array.stdev
-- ❌ array.sum
-- ❌ array.unshift
+- ✅ array.sum
+- ✅ array.unshift
 - ❌ array.variance
 
 ### Math Functions
@@ -1063,13 +1063,13 @@ This document tracks the implementation status of PineScript v6 features in pyne
 
 - **Parser**: ~90% complete (basic syntax parsing)
 - **Evaluator**: ~50% complete (expressions, functions, comparisons, conditionals)
-- **Built-in Functions**: ~10% complete (30+ math/string/array/TA functions)
+- **Built-in Functions**: ~25% complete (70+ math/string/array/TA functions)
 - **Types**: ~50% complete (basic types)
-- **Collections**: ~20% complete (arrays/tuples basic support)
+- **Collections**: ~60% complete (arrays/tuples basic support)
 - **Drawing**: 0% complete
 - **Strategy**: 0% complete
 
-**Overall**: ~35-40% complete
+**Overall**: ~50-55% complete
 
 ### Recently Implemented (Evaluator)
 
@@ -1088,9 +1088,15 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - str.endswith, str.repeat, str.replace, str.replace_all
 - str.split, str.trim, str.tonumber, str.tostring
 
-#### Array Functions (2)
+#### Array Functions (30)
 
-- array.size, array.get
+- array.size, array.get, array.push, array.pop, array.slice
+- array.abs, array.avg, array.concat, array.copy
+- array.every, array.fill, array.first, array.from
+- array.includes, array.indexof, array.insert, array.join
+- array.last, array.lastindexof, array.max, array.min
+- array.range, array.remove, array.reverse, array.set
+- array.shift, array.some, array.sort, array.sum, array.unshift
 
 #### Technical Analysis Functions (11)
 

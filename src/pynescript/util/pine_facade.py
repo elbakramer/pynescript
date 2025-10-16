@@ -42,11 +42,10 @@ def get_script(script_id_part, version):
     return result
 
 
-def download_builtin_scripts(script_dir, encodig=None):
+def download_builtin_scripts(script_dir, encoding=None):
     script_dir = pathlib.Path(script_dir)
 
-    if encodig is None:
-        encoding = "utf-8"
+    encoding = encoding or "utf-8"
 
     if not script_dir.exists():
         script_dir.mkdir(parents=True, exist_ok=True)
