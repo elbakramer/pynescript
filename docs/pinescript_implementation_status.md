@@ -580,100 +580,101 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ❌ array.variance
 
 ### Math Functions
-- ❌ math.abs
-- ❌ math.acos
-- ❌ math.asin
-- ❌ math.atan
-- ❌ math.avg
-- ❌ math.ceil
-- ❌ math.cos
-- ❌ math.exp
-- ❌ math.floor
-- ❌ math.log
-- ❌ math.log10
-- ❌ math.max
-- ❌ math.min
-- ❌ math.pow
+- ✅ math.abs
+- ✅ math.acos
+- ✅ math.asin
+- ✅ math.atan
+- ✅ math.avg
+- ✅ math.ceil
+- ✅ math.cos
+- ✅ math.exp
+- ✅ math.floor
+- ✅ math.log
+- ✅ math.log10
+- ✅ math.max
+- ✅ math.min
+- ✅ math.pow
 - ❌ math.random
-- ❌ math.round
+- ✅ math.round
 - ❌ math.round_to_mintick
-- ❌ math.sign
-- ❌ math.sin
-- ❌ math.sqrt
-- ❌ math.sum
-- ❌ math.tan
-- ❌ math.todegrees
-- ❌ math.toradians
+- ✅ math.sign
+- ✅ math.sin
+- ✅ math.sqrt
+- ✅ math.sum
+- ✅ math.tan
+- ✅ math.todegrees
+- ✅ math.toradians
 
 ### String Functions
-- ❌ str.contains
-- ❌ str.endswith
+- ✅ str.contains
+- ✅ str.endswith
 - ❌ str.format
 - ❌ str.format_time
-- ❌ str.length
-- ❌ str.lower
+- ✅ str.length
+- ✅ str.lower
 - ❌ str.match
 - ❌ str.pos
-- ❌ str.repeat
-- ❌ str.replace
-- ❌ str.replace_all
-- ❌ str.split
-- ❌ str.startswith
-- ❌ str.substring
-- ❌ str.tonumber
-- ❌ str.tostring
-- ❌ str.trim
-- ❌ str.upper
+- ✅ str.repeat
+- ✅ str.replace
+- ✅ str.replace_all
+- ✅ str.split
+- ✅ str.startswith
+- ✅ str.substring
+- ✅ str.tonumber
+- ✅ str.tostring
+- ✅ str.trim
+- ✅ str.upper
 
 ### Technical Analysis Functions
 - ❌ ta.alma
-- ❌ ta.atr
+- ✅ ta.atr
+- ✅ ta.adx
 - ❌ ta.barssince
-- ❌ ta.bb
+- ✅ ta.bb
 - ❌ ta.bbw
-- ❌ ta.cci
-- ❌ ta.change
+- ✅ ta.cci
+- ✅ ta.change
 - ❌ ta.cmo
 - ❌ ta.cog
 - ❌ ta.correlation
 - ❌ ta.cross
-- ❌ ta.crossover
-- ❌ ta.crossunder
-- ❌ ta.cum
-- ❌ ta.dev
+- ✅ ta.crossover
+- ✅ ta.crossunder
+- ✅ ta.cum
+- ✅ ta.dev
 - ❌ ta.dmi
-- ❌ ta.ema
+- ✅ ta.ema
 - ❌ ta.falling
-- ❌ ta.highest
+- ✅ ta.highest
 - ❌ ta.highestbars
 - ❌ ta.hma
 - ❌ ta.kc
 - ❌ ta.kcw
 - ❌ ta.linreg
-- ❌ ta.lowest
+- ✅ ta.lowest
 - ❌ ta.lowestbars
-- ❌ ta.macd
-- ❌ ta.max
+- ✅ ta.macd
+- ✅ ta.max
 - ❌ ta.median
-- ❌ ta.mfi
-- ❌ ta.min
+- ✅ ta.mfi
+- ✅ ta.min
 - ❌ ta.mode
-- ❌ ta.mom
+- ✅ ta.mom
 - ❌ ta.percentile_linear_interpolation
 - ❌ ta.percentile_nearest_rank
 - ❌ ta.percentrank
 - ❌ ta.pivot_point_levels
 - ❌ ta.pivothigh
 - ❌ ta.pivotlow
-- ❌ ta.range
+- ✅ ta.range
 - ❌ ta.rci
 - ❌ ta.rising
 - ❌ ta.rma
-- ❌ ta.roc
-- ❌ ta.rsi
+- ✅ ta.roc
+- ✅ ta.rsi
 - ❌ ta.sar
-- ❌ ta.sma
-- ❌ ta.stdev
+- ✅ ta.sma
+- ✅ ta.stdev
 - ✅ ta.stoch
 - ❌ ta.supertrend
 - ❌ ta.swma
@@ -683,8 +684,8 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ❌ ta.variance
 - ❌ ta.vwap
 - ❌ ta.vwma
-- ❌ ta.wma
-- ❌ ta.wpr
+- ✅ ta.wma
+- ✅ ta.wpr
 - ❌ ta.zigzag
 
 ### Plotting Functions
@@ -1077,15 +1078,22 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - math.round, math.floor, math.ceil
 - math.pow, math.log
 - math.sin, math.cos, math.tan
+- math.acos, math.asin, math.atan, math.exp, math.log10
+- math.sign, math.sum, math.avg, math.todegrees, math.toradians
 
-#### String Functions (6)
+#### String Functions (14)
+
 - str.length, str.upper, str.lower
 - str.contains, str.startswith, str.substring
+- str.endswith, str.repeat, str.replace, str.replace_all
+- str.split, str.trim, str.tonumber, str.tostring
 
 #### Array Functions (2)
+
 - array.size, array.get
 
 #### Technical Analysis Functions (11)
+
 - ta.sma (Simple Moving Average)
 - ta.ema (Exponential Moving Average)
 - ta.wma (Weighted Moving Average)
@@ -1097,12 +1105,14 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ta.crossover, ta.crossunder
 
 #### Utility Functions (6)
+
 - na() - returns None
 - nz() - null coalescing
 - bool(), int(), float() - type conversions
 - color.new() - color creation
 
 #### Operators & Control Flow
+
 - All arithmetic operators: +, -, *, /, %
 - All comparison operators: ==, !=, <, <=, >, >=
 - Boolean operators: and, or, not

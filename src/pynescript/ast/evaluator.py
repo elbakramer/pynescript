@@ -120,13 +120,10 @@ class NodeLiteralEvaluator(NodeVisitor):
         kwargs = {}
 
         for arg in node.args:
-
             if arg.name:
-
                 kwargs[arg.name] = self.visit(arg.value)
 
             else:
-
                 args.append(self.visit(arg.value))
 
         # Handle built-in functions
@@ -141,14 +138,10 @@ class NodeLiteralEvaluator(NodeVisitor):
             "math.max": lambda: max(args),
             "math.min": lambda: min(args),
             "math.abs": (
-                lambda: abs(args[0])
-                if len(args) == 1
-                else self._error("math.abs takes exactly one argument")
+                lambda: abs(args[0]) if len(args) == 1 else self._error("math.abs takes exactly one argument")
             ),
             "math.sqrt": (
-                lambda: math.sqrt(args[0])
-                if len(args) == 1
-                else self._error("math.sqrt takes exactly one argument")
+                lambda: math.sqrt(args[0]) if len(args) == 1 else self._error("math.sqrt takes exactly one argument")
             ),
             "math.round": (
                 lambda: (
@@ -160,14 +153,10 @@ class NodeLiteralEvaluator(NodeVisitor):
                 )
             ),
             "math.floor": (
-                lambda: math.floor(args[0])
-                if len(args) == 1
-                else self._error("math.floor takes exactly one argument")
+                lambda: math.floor(args[0]) if len(args) == 1 else self._error("math.floor takes exactly one argument")
             ),
             "math.ceil": (
-                lambda: math.ceil(args[0])
-                if len(args) == 1
-                else self._error("math.ceil takes exactly one argument")
+                lambda: math.ceil(args[0]) if len(args) == 1 else self._error("math.ceil takes exactly one argument")
             ),
             "math.pow": (
                 lambda: math.pow(args[0], args[1])
@@ -184,19 +173,63 @@ class NodeLiteralEvaluator(NodeVisitor):
                 )
             ),
             "math.sin": (
-                lambda: math.sin(args[0])
-                if len(args) == 1
-                else self._error("math.sin takes exactly one argument")
+                lambda: math.sin(args[0]) if len(args) == 1 else self._error("math.sin takes exactly one argument")
             ),
             "math.cos": (
-                lambda: math.cos(args[0])
-                if len(args) == 1
-                else self._error("math.cos takes exactly one argument")
+                lambda: math.cos(args[0]) if len(args) == 1 else self._error("math.cos takes exactly one argument")
             ),
             "math.tan": (
-                lambda: math.tan(args[0])
+                lambda: math.tan(args[0]) if len(args) == 1 else self._error("math.tan takes exactly one argument")
+            ),
+            "math.acos": (
+                lambda: math.acos(args[0])
                 if len(args) == 1
-                else self._error("math.tan takes exactly one argument")
+                else self._error("math.acos takes exactly one argument")
+            ),
+            "math.asin": (
+                lambda: math.asin(args[0])
+                if len(args) == 1
+                else self._error("math.asin takes exactly one argument")
+            ),
+            "math.atan": (
+                lambda: math.atan(args[0])
+                if len(args) == 1
+                else self._error("math.atan takes exactly one argument")
+            ),
+            "math.exp": (
+                lambda: math.exp(args[0])
+                if len(args) == 1
+                else self._error("math.exp takes exactly one argument")
+            ),
+            "math.log10": (
+                lambda: math.log10(args[0])
+                if len(args) == 1
+                else self._error("math.log10 takes exactly one argument")
+            ),
+            "math.sign": (
+                lambda: (1 if args[0] > 0 else -1 if args[0] < 0 else 0)
+                if len(args) == 1
+                else self._error("math.sign takes exactly one argument")
+            ),
+            "math.sum": (
+                lambda: sum(args[0])
+                if len(args) == 1 and isinstance(args[0], list)
+                else self._error("math.sum takes exactly one array argument")
+            ),
+            "math.avg": (
+                lambda: statistics.mean(args[0])
+                if len(args) == 1 and isinstance(args[0], list) and args[0]
+                else self._error("math.avg takes exactly one non-empty array argument")
+            ),
+            "math.todegrees": (
+                lambda: math.degrees(args[0])
+                if len(args) == 1
+                else self._error("math.todegrees takes exactly one argument")
+            ),
+            "math.toradians": (
+                lambda: math.radians(args[0])
+                if len(args) == 1
+                else self._error("math.toradians takes exactly one argument")
             ),
             "str.length": (
                 lambda: len(args[0])
@@ -215,31 +248,19 @@ class NodeLiteralEvaluator(NodeVisitor):
             ),
             "str.contains": (
                 lambda: args[1] in args[0]
-                if (
-                    len(args) == 2
-                    and isinstance(args[0], str)
-                    and isinstance(args[1], str)
-                )
+                if (len(args) == 2 and isinstance(args[0], str) and isinstance(args[1], str))
                 else self._error("str.contains takes two string arguments")
             ),
             "str.startswith": (
                 lambda: args[0].startswith(args[1])
-                if (
-                    len(args) == 2
-                    and isinstance(args[0], str)
-                    and isinstance(args[1], str)
-                )
+                if (len(args) == 2 and isinstance(args[0], str) and isinstance(args[1], str))
                 else self._error("str.startswith takes two string arguments")
             ),
             "str.substring": (
                 lambda: (
-                    args[0][args[1]:]
-                    if (
-                        len(args) == 2
-                        and isinstance(args[0], str)
-                        and isinstance(args[1], int)
-                    )
-                    else args[0][args[1]:args[2]]
+                    args[0][args[1] :]
+                    if (len(args) == 2 and isinstance(args[0], str) and isinstance(args[1], int))
+                    else args[0][args[1] : args[2]]
                     if (
                         len(args) == 3
                         and isinstance(args[0], str)
@@ -249,6 +270,72 @@ class NodeLiteralEvaluator(NodeVisitor):
                     else self._error("str.substring takes string and 1-2 ints")
                 )
             ),
+            "str.endswith": (
+                lambda: args[0].endswith(args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], str)
+                    and isinstance(args[1], str)
+                )
+                else self._error("str.endswith takes two string arguments")
+            ),
+            "str.repeat": (
+                lambda: args[0] * args[1]
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], str)
+                    and isinstance(args[1], int)
+                )
+                else self._error("str.repeat takes string and int")
+            ),
+            "str.replace": (
+                lambda: args[0].replace(args[1], args[2], 1)
+                if (
+                    len(args) == 3
+                    and isinstance(args[0], str)
+                    and isinstance(args[1], str)
+                    and isinstance(args[2], str)
+                )
+                else self._error("str.replace takes three string arguments")
+            ),
+            "str.replace_all": (
+                lambda: args[0].replace(args[1], args[2])
+                if (
+                    len(args) == 3
+                    and isinstance(args[0], str)
+                    and isinstance(args[1], str)
+                    and isinstance(args[2], str)
+                )
+                else self._error("str.replace_all takes three string arguments")
+            ),
+            "str.split": (
+                lambda: (
+                    args[0].split(args[1])
+                    if (
+                        len(args) == 2
+                        and isinstance(args[0], str)
+                        and isinstance(args[1], str)
+                    )
+                    else args[0].split()
+                    if len(args) == 1 and isinstance(args[0], str)
+                    else self._error("str.split takes string and optional separator")
+                )
+            ),
+            "str.trim": (
+                lambda: args[0].strip()
+                if len(args) == 1 and isinstance(args[0], str)
+                else self._error("str.trim takes exactly one string argument")
+            ),
+            "str.tonumber": (
+                lambda: float(args[0])
+                if len(args) == 1 and isinstance(args[0], str)
+                else self._error("str.tonumber takes exactly one string argument")
+            ),
+            "str.tostring": (
+                lambda: str(args[0])
+                if len(args) == 1
+                else self._error("str.tostring takes exactly one argument")
+            ),
             "array.size": (
                 lambda: len(args[0])
                 if len(args) == 1 and isinstance(args[0], list)
@@ -256,11 +343,7 @@ class NodeLiteralEvaluator(NodeVisitor):
             ),
             "array.get": (
                 lambda: args[0][args[1]]
-                if (
-                    len(args) == 2
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
+                if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
                 else self._error("array.get takes array and index")
             ),
             "array.push": (
@@ -274,7 +357,7 @@ class NodeLiteralEvaluator(NodeVisitor):
                 else self._error("array.pop takes non-empty array")
             ),
             "array.slice": (
-                lambda: args[0][args[1]:args[2]]
+                lambda: args[0][args[1] : args[2]]
                 if (
                     len(args) == 3
                     and isinstance(args[0], list)
@@ -284,54 +367,40 @@ class NodeLiteralEvaluator(NodeVisitor):
                 else self._error("array.slice takes array, start, end")
             ),
             "color.new": (
-                lambda: f"color({args[0]})"
-                if len(args) == 1
-                else self._error("color.new takes one argument")
+                lambda: f"color({args[0]})" if len(args) == 1 else self._error("color.new takes one argument")
             ),
             "ta.sma": (
                 lambda: (
-                    statistics.mean(args[0][-args[1]:])
-                    if (
-                        len(args) == 2
-                        and isinstance(args[0], list)
-                        and isinstance(args[1], int)
-                    )
+                    statistics.mean(args[0][-args[1] :])
+                    if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
                     else self._error("ta.sma takes series and period")
                 )
             ),
             "ta.ema": (
                 lambda: self._ema(args[0], args[1])
-                if (
-                    len(args) == 2
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
+                if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
                 else self._error("ta.ema takes series and period")
             ),
             "ta.rsi": (
                 lambda: self._rsi(args[0], args[1])
-                if (
-                    len(args) == 2
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
+                if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
                 else self._error("ta.rsi takes series and period")
             ),
             "ta.stdev": (
                 lambda: (
-                    statistics.stdev(args[0][-args[1]:])
+                    statistics.stdev(args[0][-args[1] :])
                     if (
                         len(args) == 2
                         and isinstance(args[0], list)
                         and isinstance(args[1], int)
-                        and len(args[0][-args[1]:]) > 1
+                        and len(args[0][-args[1] :]) > 1
                     )
                     else self._error("ta.stdev takes series and period")
                 )
             ),
             "ta.change": (
                 lambda: (
-                    args[0][-1] - args[0][-args[1]-1]
+                    args[0][-1] - args[0][-args[1] - 1]
                     if (
                         len(args) == 2
                         and isinstance(args[0], list)
@@ -343,44 +412,28 @@ class NodeLiteralEvaluator(NodeVisitor):
             ),
             "ta.highest": (
                 lambda: (
-                    max(args[0][-args[1]:])
-                    if (
-                        len(args) == 2
-                        and isinstance(args[0], list)
-                        and isinstance(args[1], int)
-                    )
+                    max(args[0][-args[1] :])
+                    if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
                     else self._error("ta.highest takes series and period")
                 )
             ),
             "ta.lowest": (
                 lambda: (
-                    min(args[0][-args[1]:])
-                    if (
-                        len(args) == 2
-                        and isinstance(args[0], list)
-                        and isinstance(args[1], int)
-                    )
+                    min(args[0][-args[1] :])
+                    if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
                     else self._error("ta.lowest takes series and period")
                 )
             ),
             "ta.range": (
                 lambda: (
-                    max(args[0][-args[1]:]) - min(args[0][-args[1]:])
-                    if (
-                        len(args) == 2
-                        and isinstance(args[0], list)
-                        and isinstance(args[1], int)
-                    )
+                    max(args[0][-args[1] :]) - min(args[0][-args[1] :])
+                    if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
                     else self._error("ta.range takes series and period")
                 )
             ),
             "ta.wma": (
                 lambda: self._wma(args[0], args[1])
-                if (
-                    len(args) == 2
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
+                if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
                 else self._error("ta.wma takes series and period")
             ),
             "ta.bb": (
@@ -449,32 +502,165 @@ class NodeLiteralEvaluator(NodeVisitor):
                     and isinstance(args[3], int)
                     and isinstance(args[4], int)
                 )
-                else self._error("ta.stoch takes highs, lows, closes, "
-                                 "k_period, d_period")
+                else self._error("ta.stoch takes highs, lows, closes, k_period, d_period")
+            ),
+            "ta.adx": (
+                lambda: self._adx(args[0], args[1], args[2], args[3])
+                if (
+                    len(args) == 4
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and isinstance(args[2], list)
+                    and isinstance(args[3], int)
+                )
+                else self._error("ta.adx takes highs, lows, closes, period")
+            ),
+            "ta.cci": (
+                lambda: self._cci(args[0], args[1], args[2], args[3])
+                if (
+                    len(args) == 4
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and isinstance(args[2], list)
+                    and isinstance(args[3], int)
+                )
+                else self._error("ta.cci takes highs, lows, closes, period")
+            ),
+            "ta.roc": (
+                lambda: self._roc(args[0], args[1])
+                if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], int))
+                else self._error("ta.roc takes series and period")
+            ),
+            "ta.wpr": (
+                lambda: self._wpr(args[0], args[1], args[2], args[3])
+                if (
+                    len(args) == 4
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and isinstance(args[2], list)
+                    and isinstance(args[3], int)
+                )
+                else self._error("ta.wpr takes highs, lows, closes, period")
+            ),
+            "ta.obv": (
+                lambda: self._obv(args[0], args[1])
+                if (len(args) == 2 and isinstance(args[0], list) and isinstance(args[1], list))
+                else self._error("ta.obv takes closes and volumes")
+            ),
+            "ta.mfi": (
+                lambda: self._mfi(args[0], args[1], args[2], args[3], args[4])
+                if (
+                    len(args) == 5
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and isinstance(args[2], list)
+                    and isinstance(args[3], list)
+                    and isinstance(args[4], int)
+                )
+                else self._error("ta.mfi takes highs, lows, closes, volumes, period")
+            ),
+            "ta.cum": (
+                lambda: self._cum(args[0])
+                if (len(args) == 1 and isinstance(args[0], list))
+                else self._error("ta.cum takes a series")
+            ),
+            "ta.dev": (
+                lambda: self._dev(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.dev takes series and period")
+            ),
+            "ta.max": (
+                lambda: self._max(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.max takes series and period")
+            ),
+            "ta.min": (
+                lambda: self._min(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.min takes series and period")
+            ),
+            "ta.mom": (
+                lambda: self._mom(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.mom takes series and period")
+            ),
+            "ta.median": (
+                lambda: self._median(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.median takes series and period")
+            ),
+            "ta.mode": (
+                lambda: self._mode(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.mode takes series and period")
+            ),
+            "ta.percentrank": (
+                lambda: self._percentrank(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.percentrank takes series and period")
+            ),
+            "ta.variance": (
+                lambda: self._variance(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.variance takes series and period")
+            ),
+            "ta.valuewhen": (
+                lambda: self._valuewhen(args[0], args[1], args[2])
+                if (
+                    len(args) == 3
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and isinstance(args[2], int)
+                )
+                else self._error("ta.valuewhen takes condition, source, occurrence")
             ),
             "na": lambda: None,
             "nz": (
-                lambda: args[1] if args[0] is None else args[0]
+                lambda: args[1]
+                if args[0] is None
+                else args[0]
                 if len(args) == 2
-                else args[0] if args[0] is not None else 0
+                else args[0]
+                if args[0] is not None
+                else 0
                 if len(args) == 1
                 else self._error("nz takes 1 or 2 arguments")
             ),
-            "bool": (
-                lambda: bool(args[0])
-                if len(args) == 1
-                else self._error("bool takes one argument")
-            ),
-            "int": (
-                lambda: int(args[0])
-                if len(args) == 1
-                else self._error("int takes one argument")
-            ),
-            "float": (
-                lambda: float(args[0])
-                if len(args) == 1
-                else self._error("float takes one argument")
-            ),
+            "bool": (lambda: bool(args[0]) if len(args) == 1 else self._error("bool takes one argument")),
+            "int": (lambda: int(args[0]) if len(args) == 1 else self._error("int takes one argument")),
+            "float": (lambda: float(args[0]) if len(args) == 1 else self._error("float takes one argument")),
         }
         if name in builtins:
             return builtins[name]()
@@ -499,7 +685,7 @@ class NodeLiteralEvaluator(NodeVisitor):
         """Calculate Relative Strength Index."""
         if len(series) < period + 1:
             return 50.0
-        changes = [series[i] - series[i-1] for i in range(1, len(series))]
+        changes = [series[i] - series[i - 1] for i in range(1, len(series))]
         gains = [max(c, 0) for c in changes[-period:]]
         losses = [abs(min(c, 0)) for c in changes[-period:]]
         avg_gain = sum(gains) / period
@@ -549,26 +735,24 @@ class NodeLiteralEvaluator(NodeVisitor):
         tr_values = []
         for i in range(1, len(highs)):
             hl = highs[i] - lows[i]
-            hc = abs(highs[i] - closes[i-1])
-            lc = abs(lows[i] - closes[i-1])
+            hc = abs(highs[i] - closes[i - 1])
+            lc = abs(lows[i] - closes[i - 1])
             tr = max(hl, hc, lc)
             tr_values.append(tr)
         if len(tr_values) < period:
             return statistics.mean(tr_values) if tr_values else 0.0
         return self._ema(tr_values, period)
 
-    def _stoch(self, highs: list, lows: list, closes: list,
-               k_period: int, d_period: int):
+    def _stoch(self, highs: list, lows: list, closes: list, k_period: int, d_period: int):
         """Calculate Stochastic Oscillator (%K, %D)."""
-        if (len(highs) < k_period or len(lows) < k_period or
-                len(closes) < k_period):
+        if len(highs) < k_period or len(lows) < k_period or len(closes) < k_period:
             return [0.0, 0.0]
 
         # Calculate %K values
         k_values = []
         for i in range(k_period - 1, len(closes)):
-            high_win = highs[i - k_period + 1:i + 1]
-            low_win = lows[i - k_period + 1:i + 1]
+            high_win = highs[i - k_period + 1 : i + 1]
+            low_win = lows[i - k_period + 1 : i + 1]
             high_max = max(high_win)
             low_min = min(low_win)
             close_curr = closes[i]
@@ -589,6 +773,255 @@ class NodeLiteralEvaluator(NodeVisitor):
             d = statistics.mean(k_values[-d_period:])
 
         return [k, d]
+
+    def _adx(self, highs: list, lows: list, closes: list, period: int) -> float:
+        """Calculate Average Directional Index (ADX)."""
+        min_len = period + 1
+        if len(highs) < min_len or len(lows) < min_len or len(closes) < min_len:
+            return 0.0
+
+        # Calculate True Range, +DM, -DM
+        tr_values = []
+        plus_dm_values = []
+        minus_dm_values = []
+
+        for i in range(1, len(highs)):
+            # True Range
+            hl = highs[i] - lows[i]
+            hc = abs(highs[i] - closes[i - 1])
+            lc = abs(lows[i] - closes[i - 1])
+            tr = max(hl, hc, lc)
+            tr_values.append(tr)
+
+            # Directional Movement
+            high_diff = highs[i] - highs[i - 1]
+            low_diff = lows[i - 1] - lows[i]
+
+            plus_dm = high_diff if high_diff > low_diff and high_diff > 0 else 0.0
+            minus_dm = low_diff if low_diff > high_diff and low_diff > 0 else 0.0
+
+            plus_dm_values.append(plus_dm)
+            minus_dm_values.append(minus_dm)
+
+        if len(tr_values) < period:
+            return 0.0
+
+        # Calculate smoothed values using EMA
+        tr_ema = self._ema(tr_values, period)
+        plus_dm_ema = self._ema(plus_dm_values, period)
+        minus_dm_ema = self._ema(minus_dm_values, period)
+
+        # Calculate Directional Indicators
+        plus_di = 100.0 * plus_dm_ema / tr_ema if tr_ema != 0 else 0.0
+        minus_di = 100.0 * minus_dm_ema / tr_ema if tr_ema != 0 else 0.0
+
+        # Calculate DX
+        di_sum = plus_di + minus_di
+        di_diff = abs(plus_di - minus_di)
+        dx = 100.0 * di_diff / di_sum if di_sum != 0 else 0.0
+
+        # Calculate ADX as EMA of DX
+        dx_values = [dx]  # For simplicity, use current DX as single value
+        adx = self._ema(dx_values, period)
+
+        return adx
+
+    def _cci(self, highs: list, lows: list, closes: list, period: int) -> float:
+        """Calculate Commodity Channel Index (CCI)."""
+        if len(highs) < period or len(lows) < period or len(closes) < period:
+            return 0.0
+
+        # Calculate Typical Price for each period
+        typical_prices = []
+        for i in range(len(highs)):
+            tp = (highs[i] + lows[i] + closes[i]) / 3.0
+            typical_prices.append(tp)
+
+        # Calculate SMA of Typical Price
+        if len(typical_prices) < period:
+            return 0.0
+
+        sma_tp = statistics.mean(typical_prices[-period:])
+
+        # Calculate Mean Deviation
+        deviations = [abs(tp - sma_tp) for tp in typical_prices[-period:]]
+        mean_dev = statistics.mean(deviations) if deviations else 0.0
+
+        # Calculate CCI
+        if mean_dev == 0:
+            return 0.0
+
+        cci = (typical_prices[-1] - sma_tp) / (0.015 * mean_dev)
+        return cci
+
+    def _roc(self, series: list, period: int) -> float:
+        """Calculate Rate of Change (ROC)."""
+        if len(series) < period + 1:
+            return 0.0
+
+        current = series[-1]
+        past = series[-(period + 1)]
+
+        if past == 0:
+            return 0.0
+
+        roc = ((current - past) / past) * 100.0
+        return roc
+
+    def _wpr(self, highs: list, lows: list, closes: list, period: int) -> float:
+        """Calculate Williams %R."""
+        if len(highs) < period or len(lows) < period or len(closes) < period:
+            return 0.0
+
+        # Get highest high and lowest low over the period
+        high_window = highs[-period:]
+        low_window = lows[-period:]
+        highest_high = max(high_window)
+        lowest_low = min(low_window)
+        current_close = closes[-1]
+
+        if highest_high == lowest_low:
+            return -50.0  # Neutral value when range is zero
+
+        wpr = ((highest_high - current_close) / (highest_high - lowest_low)) * -100.0
+        return wpr
+
+    def _obv(self, closes: list, volumes: list) -> float:
+        """Calculate On Balance Volume (OBV)."""
+        if len(closes) < 2 or len(volumes) < 2:
+            return 0.0
+
+        obv = 0.0
+        for i in range(1, len(closes)):
+            if closes[i] > closes[i - 1]:
+                obv += volumes[i]
+            elif closes[i] < closes[i - 1]:
+                obv -= volumes[i]
+            # If closes[i] == closes[i-1], OBV remains unchanged
+
+        return obv
+
+    def _mfi(self, highs: list, lows: list, closes: list, volumes: list, period: int) -> float:
+        """Calculate Money Flow Index (MFI)."""
+        if len(highs) < period or len(lows) < period or len(closes) < period or len(volumes) < period:
+            return 0.0
+
+        # Calculate Typical Price and Raw Money Flow
+        typical_prices = []
+        money_flows = []
+
+        for i in range(len(highs)):
+            tp = (highs[i] + lows[i] + closes[i]) / 3.0
+            typical_prices.append(tp)
+
+            if i > 0:
+                if tp > typical_prices[i - 1]:
+                    money_flows.append(tp * volumes[i])  # Positive money flow
+                elif tp < typical_prices[i - 1]:
+                    money_flows.append(-tp * volumes[i])  # Negative money flow
+                else:
+                    money_flows.append(0.0)  # No money flow
+
+        # Calculate Money Flow Ratio
+        if len(money_flows) < period:
+            return 0.0
+
+        positive_flow = sum(mf for mf in money_flows[-period:] if mf > 0)
+        negative_flow = abs(sum(mf for mf in money_flows[-period:] if mf < 0))
+
+        if negative_flow == 0:
+            return 100.0  # All positive flow
+
+        money_flow_ratio = positive_flow / negative_flow
+        mfi = 100.0 - (100.0 / (1.0 + money_flow_ratio))
+        return mfi
+
+    def _cum(self, series: list) -> float:
+        """Calculate cumulative sum of series."""
+        if not series:
+            return 0.0
+        return sum(series)
+
+    def _dev(self, series: list, period: int) -> float:
+        """Calculate standard deviation from mean over period."""
+        if len(series) < period:
+            return 0.0
+        recent_values = series[-period:]
+        mean_val = statistics.mean(recent_values)
+        if len(recent_values) > 1:
+            return statistics.stdev(recent_values, mean_val)
+        return 0.0
+
+    def _max(self, series: list, period: int) -> float:
+        """Calculate maximum value over period."""
+        if len(series) < period:
+            return 0.0
+        return max(series[-period:])
+
+    def _min(self, series: list, period: int) -> float:
+        """Calculate minimum value over period."""
+        if len(series) < period:
+            return 0.0
+        return min(series[-period:])
+
+    def _mom(self, series: list, period: int) -> float:
+        """Calculate momentum (current value - value n periods ago)."""
+        if len(series) < period + 1:
+            return 0.0
+        return series[-1] - series[-(period + 1)]
+
+    def _median(self, series: list, period: int) -> float:
+        """Calculate median value over period."""
+        if len(series) < period:
+            return 0.0
+        recent_values = series[-period:]
+        return statistics.median(recent_values)
+
+    def _mode(self, series: list, period: int) -> float:
+        """Calculate mode (most frequent value) over period."""
+        if len(series) < period:
+            return 0.0
+        recent_values = series[-period:]
+        try:
+            return statistics.mode(recent_values)
+        except statistics.StatisticsError:
+            # Return the first value if there's no unique mode
+            return recent_values[0]
+
+    def _percentrank(self, series: list, period: int) -> float:
+        """Calculate percentile rank over period."""
+        if len(series) < period:
+            return 0.0
+        recent_values = series[-period:]
+        current_value = recent_values[-1]
+        # Count how many values are less than current
+        count_less = sum(1 for v in recent_values if v < current_value)
+        return (count_less / (len(recent_values) - 1)) * 100.0
+
+    def _variance(self, series: list, period: int) -> float:
+        """Calculate variance over period."""
+        if len(series) < period:
+            return 0.0
+        recent_values = series[-period:]
+        if len(recent_values) < 2:
+            return 0.0
+        return statistics.variance(recent_values)
+
+    def _valuewhen(self, condition: list, source: list,
+                   occurrence: int) -> float:
+        """Return value from source series when condition was true."""
+        if len(condition) != len(source) or occurrence < 1:
+            return 0.0
+        
+        # Find occurrences where condition is true
+        true_indices = [i for i, val in enumerate(condition) if val]
+        
+        if len(true_indices) < occurrence:
+            return 0.0
+            
+        # Get the index of the nth occurrence (from the end)
+        target_index = true_indices[-(occurrence)]
+        return source[target_index]
 
     def generic_visit(self, node: ast.AST):
         msg = f"unexpected type of node: {type(node)}"

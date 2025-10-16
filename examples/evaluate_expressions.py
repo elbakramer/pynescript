@@ -106,6 +106,66 @@ def main():
     print(f"ta.stoch(highs, lows, closes, 5, 3) = "
           f"[%K={stoch_result[0]:.2f}, %D={stoch_result[1]:.2f}]")
 
+    # Average Directional Index
+    print("\n--- Technical Analysis: Average Directional Index ---")
+    adx_result = literal_eval(f"ta.adx({highs}, {lows}, {closes}, 14)")
+    print(f"ta.adx(highs, lows, closes, 14) = {adx_result:.2f}")
+
+    # New TA Functions: CCI, ROC, Williams %R, OBV, MFI
+    print("\n--- Technical Analysis: New Indicators ---")
+    cci_result = literal_eval(f"ta.cci({highs}, {lows}, {closes}, 10)")
+    print(f"ta.cci(highs, lows, closes, 10) = {cci_result:.2f}")
+    
+    roc_result = literal_eval(f"ta.roc({closes}, 5)")
+    print(f"ta.roc(closes, 5) = {roc_result:.2f}%")
+    
+    wpr_result = literal_eval(f"ta.wpr({highs}, {lows}, {closes}, 14)")
+    print(f"ta.wpr(highs, lows, closes, 14) = {wpr_result:.2f}")
+    
+    volumes = [1000, 1200, 800, 1500, 1100, 1300, 900, 1400, 1600,
+               1100, 1700, 1200, 1800, 1300, 1900]
+    obv_result = literal_eval(f"ta.obv({closes}, {volumes})")
+    print(f"ta.obv(closes, volumes) = {obv_result:.0f}")
+    
+    mfi_result = literal_eval(f"ta.mfi({highs}, {lows}, {closes}, "
+                              f"{volumes}, 14)")
+    print(f"ta.mfi(highs, lows, closes, volumes, 14) = {mfi_result:.2f}")
+
+    # New TA functions
+    print("\n--- Additional Technical Analysis: New Functions ---")
+    cum_result = literal_eval(f"ta.cum({closes})")
+    print(f"ta.cum(closes) = {cum_result:.2f}")
+    
+    dev_result = literal_eval(f"ta.dev({closes}, 5)")
+    print(f"ta.dev(closes, 5) = {dev_result:.4f}")
+    
+    max_result = literal_eval(f"ta.max({closes}, 5)")
+    print(f"ta.max(closes, 5) = {max_result:.2f}")
+    
+    min_result = literal_eval(f"ta.min({closes}, 5)")
+    print(f"ta.min(closes, 5) = {min_result:.2f}")
+    
+    mom_result = literal_eval(f"ta.mom({closes}, 3)")
+    print(f"ta.mom(closes, 3) = {mom_result:.2f}")
+
+    # More TA functions
+    median_result = literal_eval(f"ta.median({closes}, 5)")
+    print(f"ta.median(closes, 5) = {median_result:.2f}")
+    
+    mode_result = literal_eval(f"ta.mode({closes}, 5)")
+    print(f"ta.mode(closes, 5) = {mode_result:.2f}")
+    
+    percentrank_result = literal_eval(f"ta.percentrank({closes}, 5)")
+    print(f"ta.percentrank(closes, 5) = {percentrank_result:.2f}")
+    
+    variance_result = literal_eval(f"ta.variance({closes}, 5)")
+    print(f"ta.variance(closes, 5) = {variance_result:.4f}")
+    
+    # For valuewhen, create a condition series (close > 105)
+    conditions = [c > 105 for c in closes]
+    valuewhen_result = literal_eval(f"ta.valuewhen({conditions}, {closes}, 1)")
+    print(f"ta.valuewhen(conditions, closes, 1) = {valuewhen_result:.2f}")
+
     # Utility functions
     print("\n--- Utility Functions ---")
     print("na() =", literal_eval("na()"))
