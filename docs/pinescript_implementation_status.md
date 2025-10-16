@@ -674,7 +674,7 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ❌ ta.sar
 - ❌ ta.sma
 - ❌ ta.stdev
-- ❌ ta.stoch
+- ✅ ta.stoch
 - ❌ ta.supertrend
 - ❌ ta.swma
 - ❌ ta.tr

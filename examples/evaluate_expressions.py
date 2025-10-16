@@ -100,6 +100,12 @@ def main():
     atr_result = literal_eval(f"ta.atr({highs}, {lows}, {closes}, 14)")
     print(f"ta.atr(highs, lows, closes, 14) = {atr_result:.2f}")
 
+    # Stochastic Oscillator
+    print("\n--- Technical Analysis: Stochastic Oscillator ---")
+    stoch_result = literal_eval(f"ta.stoch({highs}, {lows}, {closes}, 5, 3)")
+    print(f"ta.stoch(highs, lows, closes, 5, 3) = "
+          f"[%K={stoch_result[0]:.2f}, %D={stoch_result[1]:.2f}]")
+
     # Utility functions
     print("\n--- Utility Functions ---")
     print("na() =", literal_eval("na()"))

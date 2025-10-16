@@ -13,8 +13,8 @@ This branch (`complete-pinescript-parsing`) significantly extends the pynescript
 | Component | Completion | Progress |
 |-----------|------------|----------|
 | **Parser** | ~90% | Grammar covers most PineScript v6 syntax |
-| **Evaluator** | ~60% | Expressions, functions, operators, series history fully functional |
-| **Built-in Functions** | ~15% | 40+ core functions implemented (math, string, array, TA) |
+| **Evaluator** | ~65% | Expressions, functions, operators, series history fully functional |
+| **Built-in Functions** | ~16% | 42+ core functions implemented (math, string, array, TA) |
 | **Collections** | ~30% | Basic array/tuple support with manipulation functions |
 | **Types** | ~50% | Basic type system |
 | **Drawing** | 0% | Not yet implemented |
@@ -59,7 +59,7 @@ str.contains(), str.startswith(), str.substring()
 array.size(), array.get(), array.push(), array.pop(), array.slice()
 ```
 
-##### Technical Analysis (13)
+##### Technical Analysis (14)
 ```
 ta.sma()   - Simple Moving Average
 ta.ema()   - Exponential Moving Average
@@ -71,6 +71,7 @@ ta.highest(), ta.lowest(), ta.range()
 ta.change(), ta.crossover(), ta.crossunder()
 ta.macd()  - Moving Average Convergence Divergence
 ta.atr()   - Average True Range
+ta.stoch() - Stochastic Oscillator
 ```
 
 ##### Utility Functions (6)
@@ -84,7 +85,7 @@ color.new()    - Color creation
 ## Testing & Validation
 
 ### Demo Script
-Created `examples/evaluate_expressions.py` with 70+ test cases covering:
+Created `examples/evaluate_expressions.py` with 75+ test cases covering:
 - Basic arithmetic and operator precedence
 - All math functions with real inputs
 - String manipulation and searching
@@ -167,11 +168,11 @@ result = literal_eval("5 > 3 ? 'yes' : 'no'")  # "yes"
 
 ## Performance Metrics
 
-- **Lines of Code Added**: ~700
-- **Functions Implemented**: 40+
-- **Test Cases**: 70+
-- **Commits**: 15
-- **Time Investment**: ~6 hours of development
+- **Lines of Code Added**: ~750
+- **Functions Implemented**: 42+
+- **Test Cases**: 75+
+- **Commits**: 16
+- **Time Investment**: ~7 hours of development
 - **Test Pass Rate**: 100%
 
 ## Documentation

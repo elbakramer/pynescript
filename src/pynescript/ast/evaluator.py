@@ -439,6 +439,19 @@ class NodeLiteralEvaluator(NodeVisitor):
                     else self._error("ta.crossunder takes two series")
                 )
             ),
+            "ta.stoch": (
+                lambda: self._stoch(args[0], args[1], args[2], args[3], args[4])
+                if (
+                    len(args) == 5
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and isinstance(args[2], list)
+                    and isinstance(args[3], int)
+                    and isinstance(args[4], int)
+                )
+                else self._error("ta.stoch takes highs, lows, closes, "
+                                 "k_period, d_period")
+            ),
             "na": lambda: None,
             "nz": (
                 lambda: args[1] if args[0] is None else args[0]
@@ -543,6 +556,39 @@ class NodeLiteralEvaluator(NodeVisitor):
         if len(tr_values) < period:
             return statistics.mean(tr_values) if tr_values else 0.0
         return self._ema(tr_values, period)
+
+    def _stoch(self, highs: list, lows: list, closes: list,
+               k_period: int, d_period: int):
+        """Calculate Stochastic Oscillator (%K, %D)."""
+        if (len(highs) < k_period or len(lows) < k_period or
+                len(closes) < k_period):
+            return [0.0, 0.0]
+
+        # Calculate %K values
+        k_values = []
+        for i in range(k_period - 1, len(closes)):
+            high_win = highs[i - k_period + 1:i + 1]
+            low_win = lows[i - k_period + 1:i + 1]
+            high_max = max(high_win)
+            low_min = min(low_win)
+            close_curr = closes[i]
+
+            if high_max == low_min:
+                k = 100.0  # Avoid division by zero
+            else:
+                k = 100.0 * (close_curr - low_min) / (high_max - low_min)
+            k_values.append(k)
+
+        # %K is the last calculated value
+        k = k_values[-1] if k_values else 0.0
+
+        # %D is SMA of %K over d_period
+        if len(k_values) < d_period:
+            d = statistics.mean(k_values) if k_values else 0.0
+        else:
+            d = statistics.mean(k_values[-d_period:])
+
+        return [k, d]
 
     def generic_visit(self, node: ast.AST):
         msg = f"unexpected type of node: {type(node)}"
