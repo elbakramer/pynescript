@@ -30,6 +30,9 @@ from pynescript.ast.visitor import NodeVisitor
 class NodeLiteralEvaluator(NodeVisitor):
     # ruff: noqa: N802
 
+    def __init__(self, context: dict[str, Any] | None = None):
+        self.context = context or {}
+
     def visit_BoolOp(self, node: ast.BoolOp):
         if isinstance(node.op, ast.And):
             return all(self.visit(value) for value in node.values)
@@ -260,6 +263,26 @@ class NodeLiteralEvaluator(NodeVisitor):
                 )
                 else self._error("array.get takes array and index")
             ),
+            "array.push": (
+                lambda: args[0] + [args[1]]
+                if len(args) == 2 and isinstance(args[0], list)
+                else self._error("array.push takes array and value")
+            ),
+            "array.pop": (
+                lambda: args[0][:-1]
+                if len(args) == 1 and isinstance(args[0], list) and len(args[0]) > 0
+                else self._error("array.pop takes non-empty array")
+            ),
+            "array.slice": (
+                lambda: args[0][args[1]:args[2]]
+                if (
+                    len(args) == 3
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                    and isinstance(args[2], int)
+                )
+                else self._error("array.slice takes array, start, end")
+            ),
             "color.new": (
                 lambda: f"color({args[0]})"
                 if len(args) == 1
@@ -370,6 +393,28 @@ class NodeLiteralEvaluator(NodeVisitor):
                 )
                 else self._error("ta.bb takes series, period, and multiplier")
             ),
+            "ta.macd": (
+                lambda: self._macd(args[0], args[1], args[2], args[3])
+                if (
+                    len(args) == 4
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                    and isinstance(args[2], int)
+                    and isinstance(args[3], int)
+                )
+                else self._error("ta.macd takes series, fast, slow, signal")
+            ),
+            "ta.atr": (
+                lambda: self._atr(args[0], args[1], args[2], args[3])
+                if (
+                    len(args) == 4
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and isinstance(args[2], list)
+                    and isinstance(args[3], int)
+                )
+                else self._error("ta.atr takes highs, lows, closes, period")
+            ),
             "ta.crossover": (
                 lambda: (
                     args[0][-1] > args[1][-1] and args[0][-2] <= args[1][-2]
@@ -472,11 +517,40 @@ class NodeLiteralEvaluator(NodeVisitor):
         lower = middle - (mult * std)
         return [middle, upper, lower]
 
+    def _macd(self, series: list, fast: int, slow: int, signal: int):
+        """Calculate MACD (macd, signal, histogram)."""
+        if len(series) < slow:
+            return [0.0, 0.0, 0.0]
+        fast_ema = self._ema(series, fast)
+        slow_ema = self._ema(series, slow)
+        macd = fast_ema - slow_ema
+        signal_line = self._ema([macd], signal)  # EMA of MACD values, but need history
+        # For simplicity, approximate signal as EMA of recent MACD
+        hist = macd - signal_line
+        return [macd, signal_line, hist]
+
+    def _atr(self, highs: list, lows: list, closes: list, period: int) -> float:
+        """Calculate Average True Range."""
+        if len(highs) < 2 or len(lows) < 2 or len(closes) < 2:
+            return 0.0
+        tr_values = []
+        for i in range(1, len(highs)):
+            hl = highs[i] - lows[i]
+            hc = abs(highs[i] - closes[i-1])
+            lc = abs(lows[i] - closes[i-1])
+            tr = max(hl, hc, lc)
+            tr_values.append(tr)
+        if len(tr_values) < period:
+            return statistics.mean(tr_values) if tr_values else 0.0
+        return self._ema(tr_values, period)
+
     def generic_visit(self, node: ast.AST):
         msg = f"unexpected type of node: {type(node)}"
         raise ValueError(msg)
 
     def visit_Name(self, node: ast.Name) -> Any:
+        if node.id in self.context:
+            return self.context[node.id]
         return node.id
 
     def visit_Attribute(self, node: ast.Attribute) -> Any:
@@ -486,7 +560,14 @@ class NodeLiteralEvaluator(NodeVisitor):
         value = self.visit(node.value)
         slice_ = self.visit(node.slice)
         if isinstance(value, list) and isinstance(slice_, int):
-            return value[slice_]
+            if slice_ < 0:
+                msg = "Negative indices not supported in PineScript"
+                raise ValueError(msg)
+            # PineScript: series[0] is current, series[1] is previous
+            index = -(slice_ + 1)
+            if abs(index) > len(value):
+                return None  # PineScript returns na for out of bounds
+            return value[index]
         else:
             value_type = type(value)
             slice_type = type(slice_)

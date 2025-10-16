@@ -164,7 +164,9 @@ def parse(
     return _parse_inputstream(source, filename, mode)
 
 
-def literal_eval(node_or_string: AST | str):
+def literal_eval(
+    node_or_string: AST | str, context: dict[str, Any] | None = None
+):
     if isinstance(node_or_string, str):
         node_or_string = parse(node_or_string.lstrip(" \t"), mode="eval")
     if isinstance(node_or_string, Expression):
@@ -172,7 +174,7 @@ def literal_eval(node_or_string: AST | str):
 
     from pynescript.ast.evaluator import NodeLiteralEvaluator
 
-    evaluator = NodeLiteralEvaluator()
+    evaluator = NodeLiteralEvaluator(context)
     return evaluator.visit(node_or_string)
 
 

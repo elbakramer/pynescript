@@ -50,6 +50,12 @@ def main():
           literal_eval("array.size([1, 2, 3, 4, 5])"))
     print("array.get([10, 20, 30], 2) =", 
           literal_eval("array.get([10, 20, 30], 2)"))
+    print("array.push([1, 2], 3) =", 
+          literal_eval("array.push([1, 2], 3)"))
+    print("array.pop([1, 2, 3]) =", 
+          literal_eval("array.pop([1, 2, 3])"))
+    print("array.slice([10, 20, 30, 40], 1, 3) =", 
+          literal_eval("array.slice([10, 20, 30, 40], 1, 3)"))
 
     # Technical Analysis - Moving Averages
     print("\n--- Technical Analysis: Moving Averages ---")
@@ -83,6 +89,17 @@ def main():
     print(f"ta.change(prices, 1) =", 
           literal_eval(f"ta.change({prices}, 1)"))
 
+    # New TA Functions
+    print("\n--- New Technical Analysis: MACD & ATR ---")
+    macd_result = literal_eval(f"ta.macd({prices}, 12, 26, 9)")
+    print(f"ta.macd(prices, 12, 26, 9) = [macd={macd_result[0]:.2f}, "
+          f"signal={macd_result[1]:.2f}, hist={macd_result[2]:.2f}]")
+    highs = [101, 103, 102, 104, 106, 105, 107, 109, 108, 111]
+    lows = [98, 100, 99, 101, 103, 102, 104, 106, 105, 108]
+    closes = prices
+    atr_result = literal_eval(f"ta.atr({highs}, {lows}, {closes}, 14)")
+    print(f"ta.atr(highs, lows, closes, 14) = {atr_result:.2f}")
+
     # Utility functions
     print("\n--- Utility Functions ---")
     print("na() =", literal_eval("na()"))
@@ -103,6 +120,22 @@ def main():
     print("5 < 3 =", literal_eval("5 < 3"))
     print("5 == 5 =", literal_eval("5 == 5"))
     print("5 != 3 =", literal_eval("5 != 3"))
+
+    # Series History Access
+    print("\n--- Series History Access ---")
+    context = {
+        'close': [100, 102, 101, 103, 105, 104, 106, 108, 107, 110],
+        'open': [99, 101, 100, 102, 104, 103, 105, 107, 106, 109],
+        'high': [101, 103, 102, 104, 106, 105, 107, 109, 108, 111],
+        'low': [98, 100, 99, 101, 103, 102, 104, 106, 105, 108],
+    }
+    print(f"Context series lengths: close={len(context['close'])}, etc.")
+    print("close[0] (current) =", literal_eval("close[0]", context))
+    print("close[1] (previous) =", literal_eval("close[1]", context))
+    print("close[2] =", literal_eval("close[2]", context))
+    print("open[0] =", literal_eval("open[0]", context))
+    print("high[1] =", literal_eval("high[1]", context))
+    print("low[0] - low[1] =", literal_eval("low[0] - low[1]", context))
 
     print("\n" + "=" * 60)
     print("All evaluations completed successfully!")
