@@ -35,6 +35,7 @@ BY:       'by';
 CONST:    'const';
 CONTINUE: 'continue';
 ELSE:     'else';
+ENUM:     'enum';
 EXPORT:   'export';
 FALSE:    'false';
 FOR:      'for';

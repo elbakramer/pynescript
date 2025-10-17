@@ -1,4 +1,4 @@
-# Generated from C:/git/pynescript/src/pynescript/ast/grammar/antlr4/resource/PinescriptParser.g4 by ANTLR 4.13.1
+# Generated from /home/jango/Git/pynescript/src/pynescript/ast/grammar/antlr4/tool/../resource/PinescriptParser.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .PinescriptParser import PinescriptParser
@@ -111,6 +111,21 @@ class PinescriptParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by PinescriptParser#field_definition.
     def visitField_definition(self, ctx:PinescriptParser.Field_definitionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#enum_declaration.
+    def visitEnum_declaration(self, ctx:PinescriptParser.Enum_declarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#enum_definitions.
+    def visitEnum_definitions(self, ctx:PinescriptParser.Enum_definitionsContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#enum_definition.
+    def visitEnum_definition(self, ctx:PinescriptParser.Enum_definitionContext):
         return self.visitChildren(ctx)
 
 

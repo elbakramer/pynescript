@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import shutil
 import subprocess
+import sys
 
 from pathlib import Path
 
@@ -30,8 +31,9 @@ def main():
 
     grammar_file_encoding = "utf-8"
 
+    antlr4_executable = Path(sys.executable).parent / "antlr4"
     generate_grammar_command = [
-        "antlr4",
+        str(antlr4_executable),
         "-o",
         str(grammar_output_directory_path),
         "-lib",
@@ -41,8 +43,7 @@ def main():
         "-listener",
         "-visitor",
         "-Dlanguage=Python3",
-        str(grammar_source_directory_path / "*.g4"),
-    ]
+    ] + [str(p) for p in grammar_source_directory_path.glob("*.g4")]
 
     subprocess.check_call(generate_grammar_command)  # noqa: S603
 

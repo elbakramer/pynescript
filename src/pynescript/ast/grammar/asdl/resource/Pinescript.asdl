@@ -21,6 +21,7 @@ module Pinescript
 
      stmt = FunctionDef(identifier name, param* args, stmt* body, int? method, int? export, string* annotations)
           | TypeDef(identifier name, stmt* body, int? export, string* annotations)
+          | EnumDef(identifier name, stmt* body, int? export, string* annotations)
           | Assign(expr target, expr? value, expr? type, decl_mode? mode, string* annotations)
           | ReAssign(expr target, expr value)
           | AugAssign(expr target, operator op, expr value)

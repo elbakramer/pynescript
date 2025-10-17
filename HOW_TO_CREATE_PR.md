@@ -1,25 +1,18 @@
-# How to Create the Pull Request
+# How to Create a Pull Request
 
-Since you're working on a fork or don't have direct push access, here's how to create the PR:
+✅ **DONE!** The branch has been pushed to your fork at:
+https://github.com/jango-blockchained/pynescript
 
-## Option 1: If you have a fork
+## Quick Start: Create the PR Now
 
-1. **Push to your fork:**
-```bash
-cd /home/jango/Git/pynescript
-git push origin complete-pinescript-parsing
-```
+GitHub has prepared a direct link for you:
+👉 **https://github.com/jango-blockchained/pynescript/pull/new/complete-pinescript-parsing**
 
-2. **Create PR via GitHub CLI:**
-```bash
-gh pr create --repo elbakramer/pynescript \
-  --title "Complete PineScript Expression Evaluator Implementation" \
-  --body-file PR_DESCRIPTION.md \
-  --base main \
-  --head YOUR_USERNAME:complete-pinescript-parsing
-```
+1. **Click the link above** (or the one from the git push output)
 
-Replace `YOUR_USERNAME` with your GitHub username.
+2. **Change the base repository** to `elbakramer/pynescript`
+
+3. **Copy the PR title and description** from `PR_DESCRIPTION.md`
 
 ## Option 2: Create PR via GitHub Web Interface
 

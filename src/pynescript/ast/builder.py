@@ -366,6 +366,21 @@ class PinescriptASTBuilder(
         self._setLocations(type_def, ctx)
         return type_def
 
+    def visitEnum_declaration(self, ctx: PinescriptParser.Enum_declarationContext):
+        name = ctx.name()
+        body = ctx.enum_definitions()
+        export = ctx.EXPORT()
+        name = self.visit(name)
+        body = self.visit(body)
+        export = 1 if export else 0
+        enum_def = ast.EnumDef(
+            name=name,
+            body=body,
+            export=export,
+        )
+        self._setLocations(enum_def, ctx)
+        return enum_def
+
     def visitField_definitions(self, ctx: PinescriptParser.Field_definitionsContext):
         defs = ctx.field_definition()
         defs = [self.visit(d) for d in defs]
@@ -382,6 +397,23 @@ class PinescriptASTBuilder(
             target=target,
             value=value,
             type=type_spec,
+        )
+        self._setLocations(stmt, ctx)
+        return stmt
+
+    def visitEnum_definitions(self, ctx: PinescriptParser.Enum_definitionsContext):
+        defs = ctx.enum_definition()
+        defs = [self.visit(d) for d in defs]
+        return defs
+
+    def visitEnum_definition(self, ctx: PinescriptParser.Enum_definitionContext):
+        target = ctx.name_store()
+        target = self.visit(target)
+        value = ctx.expression()
+        value = value and self.visit(value)
+        stmt = ast.Assign(
+            target=target,
+            value=value,
         )
         self._setLocations(stmt, ctx)
         return stmt

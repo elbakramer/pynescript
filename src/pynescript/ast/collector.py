@@ -46,6 +46,11 @@ class StatementCollector(NodeVisitor):
         for stmt in node.body:
             yield from self.visit(stmt)
 
+    def visit_EnumDef(self, node):
+        yield node
+        for stmt in node.body:
+            yield from self.visit(stmt)
+
     def visit_Assign(self, node):
         yield node
         if isinstance(node.value, Structure):

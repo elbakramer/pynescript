@@ -27,12 +27,14 @@ classifiers = [
 dependencies = [
   "antlr4-python3-runtime>=4.13.1",
   "click>=8.1.7",
+  "requests",
+  "tqdm",
 ]
 
 [project.urls]
-Documentation = "https://github.com/elbakramer/pynescript#readme"
-Issues = "https://github.com/elbakramer/pynescript/issues"
-Source = "https://github.com/elbakramer/pynescript"
+Documentation = "https://github.com/jango-blockchain/pynescript#readme"
+Issues = "https://github.com/jango-blockchain/pynescript/issues"
+Source = "https://github.com/jango-blockchain/pynescript"
 
 [project.scripts]
 pynescript = "pynescript.__main__:cli"
@@ -57,7 +59,7 @@ test = [
 test-cov = [
   "pytest -n auto -d --cov=src/pynescript --cov=tests --cov-report=term --cov-report=lcov {args:tests}",
 ]
-coverage = [
+cov = [
   "coverage run -m pytest {args:tests}",
   "coverage combine",
   "coverage lcov",

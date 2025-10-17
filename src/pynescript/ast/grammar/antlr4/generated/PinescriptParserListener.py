@@ -1,4 +1,4 @@
-# Generated from C:/git/pynescript/src/pynescript/ast/grammar/antlr4/resource/PinescriptParser.g4 by ANTLR 4.13.1
+# Generated from /home/jango/Git/pynescript/src/pynescript/ast/grammar/antlr4/tool/../resource/PinescriptParser.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .PinescriptParser import PinescriptParser
@@ -194,6 +194,33 @@ class PinescriptParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by PinescriptParser#field_definition.
     def exitField_definition(self, ctx:PinescriptParser.Field_definitionContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#enum_declaration.
+    def enterEnum_declaration(self, ctx:PinescriptParser.Enum_declarationContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#enum_declaration.
+    def exitEnum_declaration(self, ctx:PinescriptParser.Enum_declarationContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#enum_definitions.
+    def enterEnum_definitions(self, ctx:PinescriptParser.Enum_definitionsContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#enum_definitions.
+    def exitEnum_definitions(self, ctx:PinescriptParser.Enum_definitionsContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#enum_definition.
+    def enterEnum_definition(self, ctx:PinescriptParser.Enum_definitionContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#enum_definition.
+    def exitEnum_definition(self, ctx:PinescriptParser.Enum_definitionContext):
         pass
 
 

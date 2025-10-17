@@ -38,6 +38,7 @@ compound_statement
     : compound_assignment
     | function_declaration
     | type_declaration
+    | enum_declaration
     | structure_statement;
 
 // SIMPLE STATEMENTS
@@ -82,6 +83,13 @@ type_declaration: EXPORT? TYPE name NEWLINE INDENT field_definitions DEDENT;
 
 field_definitions: field_definition+;
 field_definition:  type_specification name_store (EQUAL expression)? NEWLINE;
+
+// ENUM DECLARATION
+
+enum_declaration: EXPORT? ENUM name NEWLINE INDENT enum_definitions DEDENT;
+
+enum_definitions: enum_definition+;
+enum_definition:  name_store (EQUAL expression)? NEWLINE;
 
 // STRUCTURES
 
@@ -292,7 +300,7 @@ type_argument_list: type_specification (COMMA type_specification)* COMMA?;
 
 // NAME WITH SOFT KEYWORDS
 
-name: NAME | TYPE | METHOD | CONST | INPUT | SIMPLE | SERIES;
+name: NAME | TYPE | METHOD | CONST | INPUT | SIMPLE | SERIES | ENUM;
 
 name_load:  name;
 name_store: name;
