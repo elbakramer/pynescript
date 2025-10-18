@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import math
+import random
+import re
 import statistics
 
 from typing import Any
@@ -131,6 +133,11 @@ class BuiltinEvaluator:
                 if len(args) == unary
                 else self._error("math.toradians takes one argument")
             ),
+            "math.random": (
+                lambda args: random.random()
+                if len(args) == 0
+                else self._error("math.random takes no arguments")
+            ),
             "str.length": (
                 lambda args: len(args[0])
                 if len(args) == unary and isinstance(args[0], str)
@@ -247,6 +254,25 @@ class BuiltinEvaluator:
                 lambda args: str(args[0])
                 if len(args) == unary
                 else self._error("str.tostring takes one argument")
+            ),
+            "str.format": (
+                lambda args: args[0].format(*args[1:])
+                if len(args) >= binary and isinstance(args[0], str)
+                else self._error("str.format takes format string and args")
+            ),
+            "str.match": (
+                lambda args: bool(re.match(args[0], args[1]))
+                if len(args) == binary
+                and isinstance(args[0], str)
+                and isinstance(args[1], str)
+                else self._error("str.match takes pattern and string")
+            ),
+            "str.pos": (
+                lambda args: args[1].find(args[0])
+                if len(args) == binary
+                and isinstance(args[0], str)
+                and isinstance(args[1], str)
+                else self._error("str.pos takes substring and string")
             ),
             "array.size": (
                 lambda args: len(args[0])
@@ -455,6 +481,61 @@ class BuiltinEvaluator:
                 lambda args: sum(args[0])
                 if len(args) == unary and isinstance(args[0], list)
                 else self._error("array.sum takes an array argument")
+            ),
+            "array.binary_search": (
+                lambda args: self._binary_search(args[0], args[1])
+                if len(args) == binary and isinstance(args[0], list)
+                else self._error("array.binary_search takes array and value")
+            ),
+            "array.mode": (
+                lambda args: statistics.mode(args[0])
+                if len(args) == unary and isinstance(args[0], list) and args[0]
+                else self._error("array.mode takes non-empty array")
+            ),
+            "array.new_bool": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_bool takes no arguments")
+            ),
+            "array.new_int": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_int takes no arguments")
+            ),
+            "array.new_float": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_float takes no arguments")
+            ),
+            "array.new_string": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_string takes no arguments")
+            ),
+            "array.new_color": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_color takes no arguments")
+            ),
+            "array.new_label": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_label takes no arguments")
+            ),
+            "array.new_line": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_line takes no arguments")
+            ),
+            "array.new_box": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_box takes no arguments")
+            ),
+            "array.new_table": (
+                lambda args: []
+                if len(args) == 0
+                else self._error("array.new_table takes no arguments")
             ),
             "array.unshift": (
                 lambda args: [args[1]] + args[0]
@@ -739,6 +820,59 @@ class BuiltinEvaluator:
                 )
                 else self._error("ta.tsi takes series, long_period, short_period")
             ),
+            "ta.median": (
+                lambda args: (
+                    [
+                        None if i < args[1] - 1 else statistics.median(args[0][i - args[1] + 1 : i + 1])
+                        for i in range(len(args[0]))
+                    ]
+                    if (
+                        len(args) == binary
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                    )
+                    else self._error("ta.median takes series and period")
+                )
+            ),
+            "ta.mode": (
+                lambda args: (
+                    [
+                        None if i < args[1] - 1 else statistics.mode(args[0][i - args[1] + 1 : i + 1])
+                        for i in range(len(args[0]))
+                    ]
+                    if (
+                        len(args) == binary
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                    )
+                    else self._error("ta.mode takes series and period")
+                )
+            ),
+            "ta.variance": (
+                lambda args: (
+                    [
+                        None if i < args[1] - 1 else statistics.variance(args[0][i - args[1] + 1 : i + 1])
+                        for i in range(len(args[0]))
+                    ]
+                    if (
+                        len(args) == binary
+                        and isinstance(args[0], list)
+                        and isinstance(args[1], int)
+                        and len(args[0]) >= args[1] > 1
+                    )
+                    else self._error("ta.variance takes series and period")
+                )
+            ),
+            "ta.valuewhen": (
+                lambda args: self._valuewhen(args[0], args[1], args[2] if len(args) > 2 else 0)
+                if (
+                    len(args) in (binary, ternary)
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and (len(args) == binary or isinstance(args[2], int))
+                )
+                else self._error("ta.valuewhen takes condition, source, and optional occurrence")
+            ),
         }
         return builtins
 
@@ -802,17 +936,31 @@ class BuiltinEvaluator:
 
     def _macd(self, series: list, fast: int, slow: int, signal: int):
         if len(series) < slow:
-            return [0.0, 0.0, 0.0]
+            return []
         fast_ema = self._ema(series, fast)
         slow_ema = self._ema(series, slow)
-        macd = fast_ema - slow_ema
-        # Note: This is a simplified MACD, a real one needs historical EMA values
-        signal_line = self._ema(
-            [macd],
-            signal,
-        )
-        histogram = macd - signal_line
-        return macd, signal_line, histogram
+        macd = [f - s for f, s in zip(fast_ema, slow_ema)]
+        signal_line = self._ema(macd, signal)
+        histogram = [m - s for m, s in zip(macd, signal_line)]
+        return list(zip(macd, signal_line, histogram))
+
+    def _valuewhen(self, condition: list, source: list, occurrence: int = 0):
+        if len(condition) != len(source):
+            self._error("condition and source must have the same length")
+        # Find indices where condition is true
+        true_indices = [i for i, c in enumerate(condition) if c]
+        if occurrence >= len(true_indices):
+            return None  # or some default?
+        # Get the index for the nth occurrence (0 is most recent)
+        idx = true_indices[-(occurrence + 1)]
+        return source[idx]
+
+    def _binary_search(self, arr: list, value):
+        # Assume arr is sorted
+        try:
+            return arr.index(value)
+        except ValueError:
+            return -1
 
     def _atr(
         self,

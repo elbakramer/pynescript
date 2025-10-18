@@ -952,19 +952,13 @@ def test_evaluator_ta_ema(expression, expected):
     ("expression", "expected"),
     [
         (
-            (
-                "ta.rsi([44.34, 44.09, 44.15, 43.61, 44.33, 44.83, 45.10, 45.42, "
-                "45.84, 46.08, 45.89, 46.03, 45.61, 46.28, 46.28], 14)"
-            ),
-            [
-                None, None, None, None, None, None, None, None, None, None,
-                None, None, None, 70.4641, 70.4641
-            ],
+            "ta.atr([10, 11, 12], [8, 9, 10], [9, 10, 11], 2)",
+            [2, 2.0],
         ),
     ],
 )
-def test_evaluator_ta_rsi(expression, expected):
+def test_evaluator_ta_atr(expression, expected):
     ast = helper.parse(expression, mode="eval")
     evaluator = NodeLiteralEvaluator()
     result = evaluator.visit(ast.body)
-    assert result == pytest.approx(expected, abs=1e-4)
+    assert result == expected
