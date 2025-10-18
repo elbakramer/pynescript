@@ -181,6 +181,19 @@ class NodeUnparser(NodeVisitor):
         with self.block():
             self.traverse(node.body)
 
+    def visit_EnumDef(self, node: ast.EnumDef):
+        self.fill()
+        if node.annotations:
+            for annotation in node.annotations:
+                self.fill(annotation)
+            self.fill()
+        if node.export:
+            self.write("export ")
+        self.write("enum ")
+        self.write(node.name)
+        with self.block():
+            self.traverse(node.body)
+
     def visit_Assign(self, node: ast.Assign):
         self.fill()
         if node.annotations:

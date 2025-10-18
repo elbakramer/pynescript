@@ -54,7 +54,7 @@ dependencies = [
 ]
 [tool.hatch.envs.test.scripts]
 test = [
-  "pytest -n auto -d {args:tests}",
+  "pytest {args}",
 ]
 test-cov = [
   "pytest -n auto -d --cov=src/pynescript --cov=tests --cov-report=term --cov-report=lcov {args:tests}",
@@ -72,27 +72,17 @@ python = ["3.10", "3.11", "3.12"]
 [tool.hatch.envs.lint]
 detached = true
 dependencies = [
+  "antlr4-cli",
   "black>=24.2.0",
   "mypy>=1.8.0",
+  "pyasdl>=0.3.1",
   "ruff>=0.2.2",
 ]
 [tool.hatch.envs.lint.scripts]
-typing = [
-  "mypy --install-types --non-interactive {args:src/pynescript tests}",
-]
-style = [
-  "ruff {args:.}",
-  "black --check --diff {args:.}",
-]
-format = [
-  "black {args:.}",
-  "ruff --fix {args:.}",
-  "style",
-]
-all = [
-  "style",
-  "typing",
-]
+gen-parser = "antlr4 {args}"
+style = "ruff {args}"
+typing = "mypy --install-types --non-interactive {args:src/pynescript tests}"
+format = "ruff format {args}"
 
 [tool.hatch.envs.docs]
 detached = true

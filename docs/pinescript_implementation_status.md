@@ -528,10 +528,10 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ❌ array.binary_search
 - ❌ array.binary_search_leftmost
 - ❌ array.binary_search_rightmost
-- ❌ array.clear
+- ✅ array.clear
 - ✅ array.concat
 - ✅ array.copy
-- ❌ array.covariance
+- ✅ array.covariance
 - ✅ array.every
 - ✅ array.fill
 - ✅ array.first
@@ -544,7 +544,7 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ✅ array.last
 - ✅ array.lastindexof
 - ✅ array.max
-- ❌ array.median
+- ✅ array.median
 - ✅ array.min
 - ❌ array.mode
 - ❌ array.new_bool
@@ -626,7 +626,7 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ✅ str.upper
 
 ### Technical Analysis Functions
-- ❌ ta.alma
+- ✅ ta.alma
 - ✅ ta.atr
 - ✅ ta.adx
 - ❌ ta.barssince

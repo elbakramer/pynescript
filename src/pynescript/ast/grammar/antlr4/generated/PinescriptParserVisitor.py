@@ -1,4 +1,4 @@
-# Generated from /home/jango/Git/pynescript/src/pynescript/ast/grammar/antlr4/tool/../resource/PinescriptParser.g4 by ANTLR 4.13.2
+# Generated from src/pynescript/ast/grammar/antlr4/resource/PinescriptParser.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .PinescriptParser import PinescriptParser

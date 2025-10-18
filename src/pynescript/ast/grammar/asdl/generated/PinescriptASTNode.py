@@ -572,6 +572,7 @@ __all__ = [
     "stmt",
     "FunctionDef",
     "TypeDef",
+    "EnumDef",
     "Assign",
     "ReAssign",
     "AugAssign",

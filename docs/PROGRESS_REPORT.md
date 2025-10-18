@@ -12,9 +12,9 @@ This branch (`complete-pinescript-parsing`) significantly extends the pynescript
 
 | Component | Completion | Progress |
 |-----------|------------|----------|
-| **Parser** | ~90% | Grammar covers most PineScript v6 syntax |
+| **Parser** | ~95% | Grammar covers most PineScript v6 syntax, including `enum` |
 | **Evaluator** | ~75% | Expressions, functions, operators, series history fully functional |
-| **Built-in Functions** | ~22% | 53+ core functions implemented (math, string, array, TA) |
+| **Built-in Functions** | ~40% | 53+ core functions implemented (math, string, array, TA) |
 | **Collections** | ~30% | Basic array/tuple support with manipulation functions |
 | **Types** | ~50% | Basic type system |
 | **Drawing** | 0% | Not yet implemented |

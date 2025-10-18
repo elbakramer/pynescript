@@ -254,7 +254,7 @@ literal_bool:   TRUE | FALSE;
 literal_color:  COLOR;
 
 grouped_expression: LPAR expression RPAR;
-tuple_expression:   LSQB expression (COMMA expression)* COMMA? RSQB;
+tuple_expression:   LSQB (expression (COMMA expression)* COMMA?)? RSQB;
 
 // IMPORT
 
