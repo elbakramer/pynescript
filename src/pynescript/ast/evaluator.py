@@ -14,4 +14,22 @@
 #
 # SPDX-License-Identifier: LGPL-3.0-or-later
 
-from pynescript.ast.evaluator import NodeLiteralEvaluator
+from __future__ import annotations
+
+from .evaluator.base import BaseEvaluator
+from .evaluator.builtins import BuiltinEvaluator
+from .evaluator.expressions import ExpressionEvaluator
+from .evaluator.literals import LiteralEvaluator
+from .evaluator.names import NameEvaluator
+from .evaluator.statements import StatementEvaluator
+
+
+class NodeLiteralEvaluator(
+    BaseEvaluator,
+    LiteralEvaluator,
+    ExpressionEvaluator,
+    BuiltinEvaluator,
+    StatementEvaluator,
+    NameEvaluator,
+):
+    pass
