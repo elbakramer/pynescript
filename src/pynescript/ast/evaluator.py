@@ -789,221 +789,119 @@ class NodeLiteralEvaluator(NodeVisitor):
                     else self._error("ta.crossunder takes two series")
                 )
             ),
-            "ta.stoch": (
-                lambda args: self._stoch(
-                    args[0],
-                    args[1],
-                    args[2],
-                    args[3],
-                    args[4],
-                )
+            "ta.cross": (
+                lambda args: self._cross(args[0], args[1])
                 if (
-                    len(args) == quinary
+                    len(args) == 2
                     and isinstance(args[0], list)
-                    and isinstance(args[1], list)
-                    and isinstance(args[2], list)
-                    and isinstance(args[3], int)
-                    and isinstance(args[4], int)
+                    and isinstance(args[1], (list, int, float))
                 )
-                else self._error("ta.stoch takes highs, lows, closes, k, d")
+                else self._error("ta.cross takes two series")
             ),
-            "ta.adx": (
-                lambda args: self._adx(
-                    args[0],
-                    args[1],
-                    args[2],
-                    args[3],
-                )
+            "ta.falling": (
+                lambda args: self._falling(args[0], args[1])
                 if (
-                    len(args) == quaternary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], list)
-                    and isinstance(args[2], list)
-                    and isinstance(args[3], int)
-                )
-                else self._error("ta.adx takes highs, lows, closes, period")
-            ),
-            "ta.cci": (
-                lambda args: self._cci(
-                    args[0],
-                    args[1],
-                    args[2],
-                    args[3],
-                )
-                if (
-                    len(args) == quaternary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], list)
-                    and isinstance(args[2], list)
-                    and isinstance(args[3], int)
-                )
-                else self._error("ta.cci takes highs, lows, closes, period")
-            ),
-            "ta.roc": (
-                lambda args: self._roc(args[0], args[1])
-                if (
-                    len(args) == binary
+                    len(args) == 2
                     and isinstance(args[0], list)
                     and isinstance(args[1], int)
                 )
-                else self._error("ta.roc takes series and period")
+                else self._error("ta.falling takes series and length")
             ),
-            "ta.wpr": (
-                lambda args: self._wpr(
-                    args[0],
-                    args[1],
-                    args[2],
-                    args[3],
-                )
+            "ta.highestbars": (
+                lambda args: self._highestbars(args[0], args[1])
                 if (
-                    len(args) == quaternary
+                    len(args) == 2
                     and isinstance(args[0], list)
-                    and isinstance(args[1], list)
-                    and isinstance(args[2], list)
-                    and isinstance(args[3], int)
+                    and isinstance(args[1], int)
                 )
-                else self._error("ta.wpr takes highs, lows, closes, period")
+                else self._error("ta.highestbars takes series and period")
             ),
-            "ta.obv": (
-                lambda args: self._obv(args[0], args[1])
+            "ta.lowestbars": (
+                lambda args: self._lowestbars(args[0], args[1])
                 if (
-                    len(args) == binary
+                    len(args) == 2
                     and isinstance(args[0], list)
-                    and isinstance(args[1], list)
+                    and isinstance(args[1], int)
                 )
-                else self._error("ta.obv takes closes and volumes")
+                else self._error("ta.lowestbars takes series and period")
             ),
-            "ta.mfi": (
-                lambda args: self._mfi(
-                    args[0],
-                    args[1],
-                    args[2],
-                    args[3],
-                    args[4],
-                )
+            "ta.rising": (
+                lambda args: self._rising(args[0], args[1])
                 if (
-                    len(args) == quinary
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.rising takes series and length")
+            ),
+            "ta.rma": (
+                lambda args: self._rma(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.rma takes series and period")
+            ),
+            "ta.vwap": (
+                lambda args: self._vwap(args[0], args[1], args[2], args[3])
+                if (
+                    len(args) == 4
                     and isinstance(args[0], list)
                     and isinstance(args[1], list)
                     and isinstance(args[2], list)
                     and isinstance(args[3], list)
-                    and isinstance(args[4], int)
                 )
-                else self._error("ta.mfi takes highs, lows, closes, vols, period")
+                else self._error("ta.vwap takes highs, lows, closes, volumes")
             ),
-            "ta.cum": (
-                lambda args: self._cum(args[0])
-                if (len(args) == unary and isinstance(args[0], list))
-                else self._error("ta.cum takes a single series argument")
-            ),
-            "ta.dev": (
-                lambda args: self._dev(args[0], args[1])
+            "ta.vwma": (
+                lambda args: self._vwma(args[0], args[1], args[2])
                 if (
-                    len(args) == binary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
-                else self._error("ta.dev takes series and period")
-            ),
-            "ta.max": (
-                lambda args: self._max(args[0], args[1])
-                if (
-                    len(args) == binary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
-                else self._error("ta.max takes series and period")
-            ),
-            "ta.min": (
-                lambda args: self._min(args[0], args[1])
-                if (
-                    len(args) == binary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
-                else self._error("ta.min takes series and period")
-            ),
-            "ta.mom": (
-                lambda args: self._mom(args[0], args[1])
-                if (
-                    len(args) == binary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
-                else self._error("ta.mom takes series and period")
-            ),
-            "ta.median": (
-                lambda args: self._median(args[0], args[1])
-                if (
-                    len(args) == binary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
-                else self._error("ta.median takes series and period")
-            ),
-            "ta.mode": (
-                lambda args: self._mode(args[0], args[1])
-                if (
-                    len(args) == binary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
-                else self._error("ta.mode takes series and period")
-            ),
-            "ta.percentrank": (
-                lambda args: self._percentrank(args[0], args[1])
-                if (
-                    len(args) == binary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
-                else self._error("ta.percentrank takes series and period")
-            ),
-            "ta.variance": (
-                lambda args: self._variance(args[0], args[1])
-                if (
-                    len(args) == binary
-                    and isinstance(args[0], list)
-                    and isinstance(args[1], int)
-                )
-                else self._error("ta.variance takes series and period")
-            ),
-            "ta.valuewhen": (
-                lambda args: self._valuewhen(args[0], args[1], args[2])
-                if (
-                    len(args) == ternary
+                    len(args) == 3
                     and isinstance(args[0], list)
                     and isinstance(args[1], list)
                     and isinstance(args[2], int)
                 )
-                else self._error("ta.valuewhen takes cond, src, occurrence")
+                else self._error("ta.vwma takes series, volumes, period")
             ),
-            "na": lambda _args: None,
-            "nz": (
-                lambda args: args[1]
-                if args[0] is None
-                else args[0]
-                if len(args) == binary
-                else args[0]
-                if args[0] is not None
-                else 0
-                if len(args) == unary
-                else self._error("nz takes 1 or 2 arguments")
+            "ta.hma": (
+                lambda args: self._hma(args[0], args[1])
+                if (
+                    len(args) == 2
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                )
+                else self._error("ta.hma takes series and period")
             ),
-            "bool": (
-                lambda args: bool(args[0])
-                if len(args) == unary
-                else self._error("bool takes one argument")
+            "ta.sar": (
+                lambda args: self._sar(
+                    args[0],
+                    args[1],
+                    args[2],
+                    args[3],
+                    args[4],
+                    args[5],
+                )
+                if (
+                    len(args) == 6
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], list)
+                    and isinstance(args[2], list)
+                    and isinstance(args[3], (int, float))
+                    and isinstance(args[4], (int, float))
+                    and isinstance(args[5], (int, float))
+                )
+                else self._error("ta.sar takes highs, lows, closes, accel, max_accel, increment")
             ),
-            "int": (
-                lambda args: int(args[0])
-                if len(args) == unary
-                else self._error("int takes one argument")
-            ),
-            "float": (
-                lambda args: float(args[0])
-                if len(args) == unary
-                else self._error("float takes one argument")
+            "ta.tsi": (
+                lambda args: self._tsi(args[0], args[1], args[2])
+                if (
+                    len(args) == 3
+                    and isinstance(args[0], list)
+                    and isinstance(args[1], int)
+                    and isinstance(args[2], int)
+                )
+                else self._error("ta.tsi takes series, long_period, short_period")
             ),
         }
         return builtins
@@ -1449,10 +1347,301 @@ class NodeLiteralEvaluator(NodeVisitor):
         return alma
 
     def _barssince(self, condition: list) -> int:
-        """Returns the number of bars since the condition was true."""
-        if not condition or not isinstance(condition, list):
-            self._error("Condition must be a series.")
+        if not condition:
+            return 0
+        
+        # Count bars since last true condition
         for i in range(len(condition) - 1, -1, -1):
             if condition[i]:
                 return len(condition) - 1 - i
-        return len(condition)
+        return len(condition)  # If no true condition found
+
+    def _bbw(self, series: list, period: int, multiplier: float) -> float:
+        if len(series) < period:
+            return 0.0
+        
+        # Calculate Bollinger Bands
+        sma = statistics.mean(series[-period:])
+        stdev = statistics.stdev(series[-period:])
+        upper = sma + (multiplier * stdev)
+        lower = sma - (multiplier * stdev)
+        
+        # Bollinger Band Width = (upper - lower) / sma
+        if sma == 0:
+            return 0.0
+        return (upper - lower) / sma
+
+    def _cmo(self, series: list, period: int) -> float:
+        if len(series) < period + 1:
+            return 0.0
+        
+        # Calculate price changes
+        changes = [series[i] - series[i-1] for i in range(1, len(series))]
+        
+        # Calculate gains and losses
+        gains = [max(change, 0) for change in changes[-period:]]
+        losses = [abs(min(change, 0)) for change in changes[-period:]]
+        
+        sum_gains = sum(gains)
+        sum_losses = sum(losses)
+        
+        if sum_gains + sum_losses == 0:
+            return 0.0
+        
+        # Chande Momentum Oscillator
+        # = (sum_gains - sum_losses) / (sum_gains + sum_losses) * 100
+        cmo = ((sum_gains - sum_losses) / (sum_gains + sum_losses)) * 100
+        return cmo
+
+    def _correlation(self, series1: list, series2: list, period: int) -> float:
+        if len(series1) < period or len(series2) < period:
+            return 0.0
+        
+        s1_window = series1[-period:]
+        s2_window = series2[-period:]
+        
+        # Calculate correlation coefficient
+        try:
+            correlation = statistics.correlation(s1_window, s2_window)
+            return correlation
+        except statistics.StatisticsError:
+            return 0.0
+
+    def _cross(self, series1: list, series2) -> bool:
+        min_length = 2
+        if len(series1) < min_length:
+            return False
+        
+        # Handle series2 being a scalar or series
+        if isinstance(series2, (int, float)):
+            s2_val = series2
+            s2_prev = series2
+        else:
+            if len(series2) < min_length:
+                return False
+            s2_val = series2[-1]
+            s2_prev = series2[-2]
+        
+        s1_val = series1[-1]
+        s1_prev = series1[-2]
+        
+        # Check if they crossed: different signs in (s1 - s2)
+        # for current and previous bars
+        prev_diff = s1_prev - s2_prev
+        curr_diff = s1_val - s2_val
+        
+        return prev_diff * curr_diff < 0
+
+    def _falling(self, series: list, length: int) -> bool:
+        if len(series) < length:
+            return False
+        
+        # Check if the series has been falling for 'length' bars
+        for i in range(1, length + 1):
+            if series[-i] >= series[-(i + 1)]:
+                return False
+        return True
+
+    def _highestbars(self, series: list, period: int) -> int:
+        if len(series) < period:
+            return 0
+        
+        # Find the highest value in the last 'period' bars
+        window = series[-period:]
+        max_value = max(window)
+        
+        # Find how many bars ago the highest value occurred
+        for i in range(len(window) - 1, -1, -1):
+            if window[i] == max_value:
+                return len(window) - 1 - i
+        return 0
+
+    def _lowestbars(self, series: list, period: int) -> int:
+        if len(series) < period:
+            return 0
+        
+        # Find the lowest value in the last 'period' bars
+        window = series[-period:]
+        min_value = min(window)
+        
+        # Find how many bars ago the lowest value occurred
+        for i in range(len(window) - 1, -1, -1):
+            if window[i] == min_value:
+                return len(window) - 1 - i
+        return 0
+
+    def _rising(self, series: list, length: int) -> bool:
+        if len(series) < length:
+            return False
+        
+        # Check if the series has been rising for 'length' bars
+        for i in range(1, length + 1):
+            if series[-i] <= series[-(i + 1)]:
+                return False
+        return True
+
+    def _rma(self, series: list, period: int) -> float:
+        if len(series) < period:
+            return 0.0
+        
+        # RMA (Running Moving Average) uses alpha = 1/period
+        alpha = 1.0 / period
+        rma = series[0]
+        
+        for price in series[1:]:
+            rma = alpha * price + (1 - alpha) * rma
+        
+        return rma
+
+    def _vwap(self, highs: list, lows: list, closes: list, volumes: list) -> float:
+        min_len = 1
+        if (len(highs) < min_len or len(lows) < min_len or
+            len(closes) < min_len or len(volumes) < min_len):
+            return 0.0
+        
+        # Ensure all series have the same length
+        series_len = min(len(highs), len(lows), len(closes), len(volumes))
+        
+        cumulative_price_volume = 0.0
+        cumulative_volume = 0.0
+        
+        for i in range(series_len):
+            # Typical price = (high + low + close) / 3
+            typical_price = (highs[i] + lows[i] + closes[i]) / 3
+            cumulative_price_volume += typical_price * volumes[i]
+            cumulative_volume += volumes[i]
+        
+        if cumulative_volume == 0:
+            return 0.0
+        
+        return cumulative_price_volume / cumulative_volume
+
+    def _vwma(self, series: list, volumes: list, period: int) -> float:
+        if len(series) < period or len(volumes) < period:
+            return 0.0
+        
+        # Calculate VWMA for the last 'period' bars
+        price_volume_sum = 0.0
+        volume_sum = 0.0
+        
+        for i in range(period):
+            idx = -(period - i)
+            price_volume_sum += series[idx] * volumes[idx]
+            volume_sum += volumes[idx]
+        
+        if volume_sum == 0:
+            return 0.0
+        
+        return price_volume_sum / volume_sum
+
+    def _hma(self, series: list, period: int) -> float:
+        if len(series) < period:
+            return 0.0
+        
+        # Hull Moving Average calculation
+        # Step 1: WMA with period/2
+        half_period = max(period // 2, 1)
+        
+        wma_half = self._wma(series, half_period)
+        
+        # Step 2: WMA with full period
+        wma_full = self._wma(series, period)
+        
+        # Step 3: 2 * WMA(half) - WMA(full)
+        diff_series = []
+        for i in range(len(wma_half)):
+            if i < len(wma_full):
+                diff_series.append(2 * wma_half[i] - wma_full[i])
+            else:
+                diff_series.append(2 * wma_half[i])
+        
+        # Step 4: WMA of the difference with sqrt(period)
+        sqrt_period = max(int(math.sqrt(period)), 1)
+        
+        return self._wma(diff_series, sqrt_period)
+
+    def _sar_full(
+        self,
+        highs: list,
+        lows: list,
+        closes: list,
+        accel: float,
+        max_accel: float,
+        increment: float,
+    ) -> list:
+        # Parabolic SAR calculation
+        # Reference: https://www.investopedia.com/terms/p/parabolic.asp
+
+        if len(highs) != len(lows) or len(highs) != len(closes):
+            self._error("Highs, lows, and closes lists must have the same length.")
+
+        sar = [0] * len(closes)
+        trend = 1  # 1 = uptrend, -1 = downtrend
+        af = accel  # Acceleration factor
+        ep = highs[0]  # Extreme point
+
+        for i in range(1, len(closes)):
+            if trend == 1:
+                sar[i] = sar[i - 1] + af * (ep - sar[i - 1])
+                sar[i] = min(sar[i], lows[i - 1], lows[i])  # Stop at the previous low
+                if highs[i] > ep:
+                    ep = highs[i]
+                    af = min(af + accel, max_accel)  # Increase AF, cap at max_accel
+            else:
+                sar[i] = sar[i - 1] + af * (ep - sar[i - 1])
+                sar[i] = max(sar[i], highs[i - 1], highs[i])  # Stop at the previous high
+                if lows[i] < ep:
+                    ep = lows[i]
+                    af = min(af + accel, max_accel)  # Increase AF, cap at max_accel
+
+            # Reverse the trend
+            if (trend == 1 and sar[i] > highs[i]) or (trend == -1 and sar[i] < lows[i]):
+                trend *= -1
+                sar[i] = ep  # Jump to the extreme point
+
+        return sar
+
+    def _sar(self, highs: list, lows: list, closes: list) -> float:
+        # Call the full SAR implementation and return the last value
+        sar_values = self._sar_full(highs, lows, closes, 0.02, 0.02, 0.02)
+        return sar_values[-1] if sar_values else 0.0
+
+    def _tsi(self, series: list, long_period: int, short_period: int) -> float:
+        if len(series) < long_period + short_period:
+            return 0.0
+        
+        # Calculate momentum
+        momentum = [series[i] - series[i-1] for i in range(1, len(series))]
+        
+        # Double smooth momentum
+        ema_short_momentum = self._ema(momentum[-long_period:], short_period)
+        ema_long_momentum = self._ema(ema_short_momentum, long_period)
+        
+        # Double smooth absolute momentum
+        abs_momentum = [abs(m) for m in momentum]
+        ema_short_abs = self._ema(abs_momentum[-long_period:], short_period)
+        ema_long_abs = self._ema(ema_short_abs, long_period)
+        
+        if not ema_long_abs or ema_long_abs[-1] == 0:
+            return 0.0
+        
+        # TSI = 100 * (double_smoothed_momentum / double_smoothed_abs_momentum)
+        tsi = 100 * (ema_long_momentum[-1] / ema_long_abs[-1])
+        return tsi
+
+    def _wma(self, series: list, period: int) -> list:
+        if len(series) < period:
+            return []
+        
+        result = []
+        for i in range(period - 1, len(series)):
+            window = series[i - period + 1:i + 1]
+            weights = list(range(1, period + 1))
+            weighted_sum = sum(
+                w * val for w, val in zip(weights, window, strict=True)
+            )
+            total_weight = sum(weights)
+            wma = weighted_sum / total_weight
+            result.append(wma)
+        
+        return result

@@ -629,30 +629,30 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ✅ ta.alma
 - ✅ ta.atr
 - ✅ ta.adx
-- ❌ ta.barssince
+- ✅ ta.barssince
 - ✅ ta.bb
-- ❌ ta.bbw
+- ✅ ta.bbw
 - ✅ ta.cci
 - ✅ ta.change
-- ❌ ta.cmo
+- ✅ ta.cmo
 - ❌ ta.cog
-- ❌ ta.correlation
-- ❌ ta.cross
+- ✅ ta.correlation
+- ✅ ta.cross
 - ✅ ta.crossover
 - ✅ ta.crossunder
 - ✅ ta.cum
 - ✅ ta.dev
 - ❌ ta.dmi
 - ✅ ta.ema
-- ❌ ta.falling
+- ✅ ta.falling
 - ✅ ta.highest
-- ❌ ta.highestbars
-- ❌ ta.hma
+- ✅ ta.highestbars
+- ✅ ta.hma
 - ❌ ta.kc
 - ❌ ta.kcw
 - ❌ ta.linreg
 - ✅ ta.lowest
-- ❌ ta.lowestbars
+- ✅ ta.lowestbars
 - ✅ ta.macd
 - ✅ ta.max
 - ❌ ta.median
@@ -668,22 +668,22 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - ❌ ta.pivotlow
 - ✅ ta.range
 - ❌ ta.rci
-- ❌ ta.rising
-- ❌ ta.rma
+- ✅ ta.rising
+- ✅ ta.rma
 - ✅ ta.roc
 - ✅ ta.rsi
-- ❌ ta.sar
+- ✅ ta.sar
 - ✅ ta.sma
 - ✅ ta.stdev
 - ✅ ta.stoch
 - ❌ ta.supertrend
 - ❌ ta.swma
 - ❌ ta.tr
-- ❌ ta.tsi
+- ✅ ta.tsi
 - ❌ ta.valuewhen
 - ❌ ta.variance
-- ❌ ta.vwap
-- ❌ ta.vwma
+- ✅ ta.vwap
+- ✅ ta.vwma
 - ✅ ta.wma
 - ✅ ta.wpr
 - ❌ ta.zigzag
@@ -1098,17 +1098,24 @@ This document tracks the implementation status of PineScript v6 features in pyne
 - array.range, array.remove, array.reverse, array.set
 - array.shift, array.some, array.sort, array.sum, array.unshift
 
-#### Technical Analysis Functions (11)
+#### Technical Analysis Functions (16)
 
-- ta.sma (Simple Moving Average)
-- ta.ema (Exponential Moving Average)
-- ta.wma (Weighted Moving Average)
-- ta.rsi (Relative Strength Index)
-- ta.stdev (Standard Deviation)
-- ta.bb (Bollinger Bands)
-- ta.highest, ta.lowest, ta.range
-- ta.change
-- ta.crossover, ta.crossunder
+- ta.alma (Arnaud Legoux Moving Average)
+- ta.barssince
+- ta.bbw (Bollinger Band Width)
+- ta.cmo (Chande Momentum Oscillator)
+- ta.correlation
+- ta.cross
+- ta.falling
+- ta.highestbars
+- ta.hma (Hull Moving Average)
+- ta.lowestbars
+- ta.rising
+- ta.rma (Running Moving Average)
+- ta.sar (Parabolic SAR)
+- ta.tsi (True Strength Index)
+- ta.vwap (Volume Weighted Average Price)
+- ta.vwma (Volume Weighted Moving Average)
 
 #### Utility Functions (6)
 
