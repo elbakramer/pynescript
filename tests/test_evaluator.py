@@ -958,7 +958,7 @@ def test_evaluator_ta_ema(expression, expected):
             ),
             [
                 None, None, None, None, None, None, None, None, None, None,
-                None, None, None, 53.3138, 53.3138
+                None, None, None, 70.4641, 70.4641
             ],
         ),
     ],

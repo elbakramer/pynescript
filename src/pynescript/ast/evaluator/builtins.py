@@ -782,18 +782,23 @@ class BuiltinEvaluator:
         return res
 
     def _rsi(self, series, period):
-        if len(series) < period:
-            return None
-        changes = [series[i] - series[i - 1] for i in range(1, len(series))]
-        gains = [max(c, 0) for c in changes[-period:]]
-        losses = [abs(min(c, 0)) for c in changes[-period:]]
-        avg_gain = sum(gains) / period
-        avg_loss = sum(losses) / period
-        if avg_loss == 0:
-            return 100.0
-        rs = avg_gain / avg_loss
-        rsi = 100 - (100 / (1 + rs))
-        return rsi
+        rsi_values = []
+        for i in range(len(series)):
+            if i < period - 1:
+                rsi_values.append(None)
+            else:
+                changes = [series[j] - series[j - 1] for j in range(1, i + 1)]
+                gains = [max(c, 0) for c in changes[-period:]]
+                losses = [abs(min(c, 0)) for c in changes[-period:]]
+                avg_gain = sum(gains) / period
+                avg_loss = sum(losses) / period
+                if avg_loss == 0:
+                    rsi_values.append(100.0)
+                else:
+                    rs = avg_gain / avg_loss
+                    rsi = 100 - (100 / (1 + rs))
+                    rsi_values.append(rsi)
+        return rsi_values
 
     def _macd(self, series: list, fast: int, slow: int, signal: int):
         if len(series) < slow:
