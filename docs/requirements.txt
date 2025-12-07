@@ -1,4 +1,6 @@
 furo==2025.9.25
 myst-parser==4.0.1
-sphinx==9.0.4
+pygments==2.19.2
+sphinx==8.2.3
 sphinx-click==6.2.0
+sphinx-autobuild==2025.8.25
