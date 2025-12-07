@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,4 +16,4 @@
 
 from __future__ import annotations
 
-from .generated import *  # noqa: F403
+from .generated import *

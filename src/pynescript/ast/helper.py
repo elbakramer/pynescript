@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import itertools
 import re
 
 from collections import deque
-from collections.abc import Iterator
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
 
 from antlr4 import CommonTokenStream
@@ -36,6 +36,10 @@ from pynescript.ast.grammar.antlr4.parser import PinescriptParser
 from pynescript.ast.node import AST
 from pynescript.ast.node import Expression
 from pynescript.util.itertools import grouper
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 
 def _add_annotations(script, statements, comments):
@@ -60,7 +64,7 @@ def _add_annotations(script, statements, comments):
 
     grouped_annotations_and_statement_pairs = grouper(grouped_annotations_and_statements, n=2, incomplete="ignore")
 
-    for comments, statement in grouped_annotations_and_statement_pairs:
+    for comments, statement in grouped_annotations_and_statement_pairs:  # noqa: PLR1704
         if isinstance(statement, ast.FunctionDef):
             annotations = [c.value for c in comments if c.kind.endswith("F")]
             if annotations:
@@ -79,7 +83,7 @@ def _parse(
     stream: InputStream,
     mode: str = "exec",
 ) -> AST:
-    if mode not in {"exec", "eval"}:
+    if mode not in {"exec", "eval", "type"}:
         msg = f"invalid argument mode: {mode}"
         raise ValueError(msg)
 
@@ -96,6 +100,7 @@ def _parse(
     rule = {
         "exec": parser.start_script,
         "eval": parser.start_expression,
+        "type": parser.start_type_annotation,
     }[mode]()
 
     builder = PinescriptASTBuilder()
@@ -176,14 +181,14 @@ def literal_eval(node_or_string: AST | str):
     return evaluator.visit(node_or_string)
 
 
-def dump(  # noqa: C901
+def dump(
     node: AST,
     *,
     annotate_fields: bool = True,
     include_attributes: bool = False,
     indent: int | None = None,
 ) -> str:
-    def _format(node, level=0):  # noqa: C901, PLR0912
+    def _format(node, level=0):
         if indent is not None:
             level += 1
             prefix = "\n" + indent * level
@@ -225,14 +230,15 @@ def dump(  # noqa: C901
             if allsimple and len(args) <= 3:  # noqa: PLR2004
                 return "{}({})".format(node.__class__.__name__, ", ".join(args)), not args
             return f"{node.__class__.__name__}({prefix}{sep.join(args)})", False
-        elif isinstance(node, list):
+        if isinstance(node, list):
             if not node:
                 return "[]", True
             return f"[{prefix}{sep.join(_format(x, level)[0] for x in node)}]", False
         return repr(node), True
 
     if not isinstance(node, AST):
-        raise TypeError("expected AST, got %r" % node.__class__.__name__)
+        msg = f"expected AST, got {node.__class__.__name__!r}"
+        raise TypeError(msg)
 
     if indent is not None and not isinstance(indent, str):
         indent = " " * indent
@@ -267,7 +273,7 @@ def iter_child_nodes(node: AST) -> Iterator[AST]:
                     yield item
 
 
-def _fix_locations(  # noqa: PLR0912
+def _fix_locations(
     node: AST,
     lineno: int,
     col_offset: int,
@@ -380,15 +386,15 @@ def unparse(node: AST):
 
 
 __all__ = [
-    "parse",
-    "literal_eval",
-    "dump",
-    "iter_fields",
-    "iter_child_nodes",
     "copy_location",
+    "dump",
     "fix_missing_locations",
-    "increment_lineno",
     "get_source_segment",
-    "walk",
+    "increment_lineno",
+    "iter_child_nodes",
+    "iter_fields",
+    "literal_eval",
+    "parse",
     "unparse",
+    "walk",
 ]

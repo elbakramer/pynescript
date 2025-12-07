@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -97,7 +97,7 @@ def parse_and_unparse(filename, encoding, output_file):
 @click.option(
     "--script-dir",
     type=click.Path(exists=False, file_okay=False, writable=True),
-    help="Diretory where scripts to be saved (like tests/data/builtin_scripts).",
+    help="Directory where scripts to be saved (like tests/data/builtin_scripts).",
     required=True,
 )
 def download_builtin_scripts(script_dir):

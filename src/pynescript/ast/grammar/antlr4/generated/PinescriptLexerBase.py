@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,20 +20,22 @@ import re
 import sys
 
 from collections import deque
+from typing import TYPE_CHECKING
 from typing import TextIO
 
 from antlr4 import InputStream
 from antlr4 import Lexer
 from antlr4 import Token
-from antlr4.Token import CommonToken
 
-from pynescript.ast.error import IndentationError
-from pynescript.ast.error import SyntaxError
+from pynescript.ast.error import IndentationError  # noqa: A004
+from pynescript.ast.error import SyntaxError  # noqa: A004
+
+
+if TYPE_CHECKING:
+    from antlr4.Token import CommonToken
 
 
 class PinescriptLexerBase(Lexer):
-    # ruff: noqa: N802, N803, N806, A002
-
     """
     - ignore possible leading newlines
     - ignore excessive trailing newlines except a single newline
@@ -41,7 +43,7 @@ class PinescriptLexerBase(Lexer):
     - ignore consecutive newlines except the last one
     - ignore newlines inside open parentheses, brackets
     - ignore newlines after operators
-    - ignore newlines for line wraping (lines whose indentation width is not a multiple of four)
+    - ignore newlines for line wrapping (lines whose indentation width is not a multiple of four)
     - track indentation level, push INDENT or DEDENT token respectfully
     - handle multiline string literal correctly (ignore <newline + indentation for line wrapping>)
     """

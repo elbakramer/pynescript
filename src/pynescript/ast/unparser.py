@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ class Precedence(IntEnum):
     NOT = FACTOR
     ATOM = auto()
 
-    def next(self):  # noqa: A003
+    def next(self):
         try:
             return self.__class__(self + 1)
         except ValueError:
@@ -113,8 +113,7 @@ class NodeUnparser(NodeVisitor):
     def delimit_if(self, start, end, condition):
         if condition:
             return self.delimit(start, end)
-        else:
-            return nullcontext()
+        return nullcontext()
 
     def require_parens(self, precedence, node):
         return self.delimit_if("(", ")", self.get_precedence(node) > precedence)
@@ -177,6 +176,19 @@ class NodeUnparser(NodeVisitor):
         if node.export:
             self.write("export ")
         self.write("type ")
+        self.write(node.name)
+        with self.block():
+            self.traverse(node.body)
+
+    def visit_EnumDef(self, node: ast.EnumDef):
+        self.fill()
+        if node.annotations:
+            for annotation in node.annotations:
+                self.fill(annotation)
+            self.fill()
+        if node.export:
+            self.write("export ")
+        self.write("enum ")
         self.write(node.name)
         with self.block():
             self.traverse(node.body)

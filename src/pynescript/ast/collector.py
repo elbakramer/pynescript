@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,32 +34,37 @@ class StatementCollector(NodeVisitor):
 
     def visit_Script(self, node):
         for stmt in node.body:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []
 
     def visit_FunctionDef(self, node):
         yield node
         for stmt in node.body:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []
 
     def visit_TypeDef(self, node):
         yield node
         for stmt in node.body:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []
+
+    def visit_EnumDef(self, node):
+        yield node
+        for stmt in node.body:
+            yield from self.visit(stmt) or []
 
     def visit_Assign(self, node):
         yield node
         if isinstance(node.value, Structure):
-            yield from self.visit(node.value)
+            yield from self.visit(node.value) or []
 
     def visit_ReAssign(self, node):
         yield node
         if isinstance(node.value, Structure):
-            yield from self.visit(node.value)
+            yield from self.visit(node.value) or []
 
     def visit_AugAssign(self, node):
         yield node
         if isinstance(node.value, Structure):
-            yield from self.visit(node.value)
+            yield from self.visit(node.value) or []
 
     def visit_Import(self, node):
         yield node
@@ -67,7 +72,7 @@ class StatementCollector(NodeVisitor):
     def visit_Expr(self, node):
         yield node
         if isinstance(node.value, Structure):
-            yield from self.visit(node.value)
+            yield from self.visit(node.value) or []
 
     def visit_Break(self, node):
         yield node
@@ -77,26 +82,26 @@ class StatementCollector(NodeVisitor):
 
     def visit_ForTo(self, node):
         for stmt in node.body:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []
 
     def visit_ForIn(self, node):
         for stmt in node.body:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []
 
     def visit_While(self, node):
         for stmt in node.body:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []
 
     def visit_If(self, node):
         for stmt in node.body:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []
         for stmt in node.orelse:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []
 
     def visit_Switch(self, node):
         for case in node.cases:
-            yield from self.visit(case)
+            yield from self.visit(case) or []
 
     def visit_Case(self, node):
         for stmt in node.body:
-            yield from self.visit(stmt)
+            yield from self.visit(stmt) or []

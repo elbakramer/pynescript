@@ -3,14 +3,18 @@ from __future__ import annotations
 import shutil
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from sphinx.application import Sphinx
 from sphinx.ext.apidoc import main as sphinx_apidoc_main
+
+
+if TYPE_CHECKING:
+    from sphinx.application import Sphinx
 
 
 project = "Pynescript"
 author = "Yunseong Hwang"
-copyright = "2024, Yunseong Hwang"  # noqa: A001
+copyright = "2025, Yunseong Hwang"  # noqa: A001
 extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",

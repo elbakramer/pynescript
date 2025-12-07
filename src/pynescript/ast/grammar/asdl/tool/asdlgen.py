@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,8 +61,7 @@ class PythonGenerator(pyasdl.ASDLVisitor):
         ]
 
     def _generate_internals(self) -> list[ast.ImportFrom | ast.Import]:
-        """
-        from __future__ import annotations
+        """From __future__ import annotations
 
         import builtins as _builtins
         import dataclasses as _dataclasses
@@ -76,8 +75,7 @@ class PythonGenerator(pyasdl.ASDLVisitor):
         ]
 
     def _generate_builtin_types(self) -> list[ast.Assign]:
-        """
-        identifier = str
+        """Identifier = str
         int = int
         string = str | bytes
         constant = str | bytes | int | float | complex | bool | tuple | frozenset | type(None) | type(Ellipsis)
@@ -110,10 +108,9 @@ class PythonGenerator(pyasdl.ASDLVisitor):
         ]
 
     def _generate_base(self) -> ast.ClassDef:
-        """
-        class AST:
-            _fields: ClassVar[list[str]] = []
-            _attributes: ClassVar[list[str]] = []
+        """Class AST:
+        _fields: ClassVar[list[str]] = []
+        _attributes: ClassVar[list[str]] = []
         """
         return ast.ClassDef(
             name=self._base.id,
@@ -127,9 +124,7 @@ class PythonGenerator(pyasdl.ASDLVisitor):
         )
 
     def _generate_exports(self, names: list[str]) -> ast.Assign:
-        """
-        ___all___ = [...]
-        """
+        """___all___ = [...]"""
         exports = ast.Assign(
             [ast.Name("__all__", ast.Store())],
             ast.List(

@@ -1,14 +1,14 @@
-// Copyright 2024 Yunseong Hwang
-// 
+// Copyright 2025 Yunseong Hwang
+//
 // Licensed under the GNU Lesser General Public License Version 3.0 (the "License"); you may not use this file except in
 // compliance with the License. You may obtain a copy of the License at
-// 
+//
 // https://www.gnu.org/licenses/lgpl-3.0.en.html
-// 
+//
 // Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-// 
+//
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 lexer grammar PinescriptLexer;
@@ -35,6 +35,7 @@ BY:       'by';
 CONST:    'const';
 CONTINUE: 'continue';
 ELSE:     'else';
+ENUM:     'enum';
 EXPORT:   'export';
 FALSE:    'false';
 FOR:      'for';
@@ -55,7 +56,7 @@ VAR:      'var';
 VARIP:    'varip';
 WHILE:    'while';
 
-// PUNCTUATIONS AND OPERATORS
+// PUNCTUATION AND OPERATORS
 
 LPAR: '(';
 RPAR: ')';
@@ -134,7 +135,7 @@ fragment COLOR_LITERAL_RGB
 fragment NUMBER_LITERAL: INTEGER | FLOAT_NUMBER | IMAG_NUMBER;
 
 fragment INTEGER:        DEC_INTEGER | BIN_INTEGER | OCT_INTEGER | HEX_INTEGER;
-fragment DEC_INTEGER:    NON_ZERO_DIGIT ('_'? DIGIT)* | '0'+ ('_'? '0')*;
+fragment DEC_INTEGER:    DIGIT ('_'? DIGIT)* | '0'+ ('_'? '0')*;
 fragment BIN_INTEGER:    '0' ('b' | 'B') ('_'? BIN_DIGIT)+;
 fragment OCT_INTEGER:    '0' ('o' | 'O') ('_'? OCT_DIGIT)+;
 fragment HEX_INTEGER:    '0' ('x' | 'X') ('_'? HEX_DIGIT)+;

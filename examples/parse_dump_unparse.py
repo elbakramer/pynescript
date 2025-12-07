@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2025 Yunseong Hwang
+# SPDX-License-Identifier: LGPL-3.0-or-later
+
 from __future__ import annotations
 
 from pynescript.ast import dump

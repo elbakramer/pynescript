@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from antlr4 import TokenStream
 
 
 class PinescriptParserBase(Parser):
-    # ruff: noqa: N802, N803, N806, A002
+    # ruff: noqa: N802, N803, A002
 
     def __init__(self, input: TokenStream, output: TextIO = sys.stdout):
         super().__init__(input, output)

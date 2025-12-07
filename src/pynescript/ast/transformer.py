@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ class NodeTransformer(NodeVisitor):
                         value = self.visit(value)  # noqa: PLW2901
                         if value is None:
                             continue
-                        elif not isinstance(value, AST):
+                        if not isinstance(value, AST):
                             new_values.extend(value)
                             continue
                     new_values.append(value)

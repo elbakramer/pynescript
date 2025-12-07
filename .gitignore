@@ -138,9 +138,18 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+# VsCode
+.vscode/
+
 # ANTLR4
 .antlr/
 
+# PyPI
+.pypirc
+
+# Claude Code
+CLAUDE.md
+.claude/
+
 # Others
 .ignore/
-.pypirc

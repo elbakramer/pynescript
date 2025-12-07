@@ -1,4 +1,4 @@
-# Generated from C:/git/pynescript/src/pynescript/ast/grammar/antlr4/resource/PinescriptParser.g4 by ANTLR 4.13.1
+# Generated from C:/Git/pynescript/src/pynescript/ast/grammar/antlr4/resource/PinescriptParser.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .PinescriptParser import PinescriptParser
@@ -41,6 +41,15 @@ class PinescriptParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by PinescriptParser#start_comments.
     def exitStart_comments(self, ctx:PinescriptParser.Start_commentsContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#start_type_annotation.
+    def enterStart_type_annotation(self, ctx:PinescriptParser.Start_type_annotationContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#start_type_annotation.
+    def exitStart_type_annotation(self, ctx:PinescriptParser.Start_type_annotationContext):
         pass
 
 
@@ -194,6 +203,33 @@ class PinescriptParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by PinescriptParser#field_definition.
     def exitField_definition(self, ctx:PinescriptParser.Field_definitionContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#enum_declaration.
+    def enterEnum_declaration(self, ctx:PinescriptParser.Enum_declarationContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#enum_declaration.
+    def exitEnum_declaration(self, ctx:PinescriptParser.Enum_declarationContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#enum_field_definitions.
+    def enterEnum_field_definitions(self, ctx:PinescriptParser.Enum_field_definitionsContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#enum_field_definitions.
+    def exitEnum_field_definitions(self, ctx:PinescriptParser.Enum_field_definitionsContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#enum_field_definition.
+    def enterEnum_field_definition(self, ctx:PinescriptParser.Enum_field_definitionContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#enum_field_definition.
+    def exitEnum_field_definition(self, ctx:PinescriptParser.Enum_field_definitionContext):
         pass
 
 
@@ -1022,6 +1058,51 @@ class PinescriptParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by PinescriptParser#comment.
     def exitComment(self, ctx:PinescriptParser.CommentContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#type_annotation.
+    def enterType_annotation(self, ctx:PinescriptParser.Type_annotationContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#type_annotation.
+    def exitType_annotation(self, ctx:PinescriptParser.Type_annotationContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#type_union.
+    def enterType_union(self, ctx:PinescriptParser.Type_unionContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#type_union.
+    def exitType_union(self, ctx:PinescriptParser.Type_unionContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#type_specification_extension.
+    def enterType_specification_extension(self, ctx:PinescriptParser.Type_specification_extensionContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#type_specification_extension.
+    def exitType_specification_extension(self, ctx:PinescriptParser.Type_specification_extensionContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#template_spec_suffix_extension.
+    def enterTemplate_spec_suffix_extension(self, ctx:PinescriptParser.Template_spec_suffix_extensionContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#template_spec_suffix_extension.
+    def exitTemplate_spec_suffix_extension(self, ctx:PinescriptParser.Template_spec_suffix_extensionContext):
+        pass
+
+
+    # Enter a parse tree produced by PinescriptParser#type_argument_list_extension.
+    def enterType_argument_list_extension(self, ctx:PinescriptParser.Type_argument_list_extensionContext):
+        pass
+
+    # Exit a parse tree produced by PinescriptParser#type_argument_list_extension.
+    def exitType_argument_list_extension(self, ctx:PinescriptParser.Type_argument_list_extensionContext):
         pass
 
 

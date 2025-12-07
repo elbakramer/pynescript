@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import re
 
+from typing import TYPE_CHECKING
+
 from antlr4 import FileStream
 from antlr4 import InputStream
 from antlr4 import Lexer
@@ -25,10 +27,13 @@ from antlr4 import Parser
 from antlr4 import Token
 from antlr4 import TokenStream
 from antlr4.error.ErrorListener import ErrorListener
-from antlr4.Recognizer import Recognizer
 
-from pynescript.ast.error import SyntaxError
+from pynescript.ast.error import SyntaxError  # noqa: A004
 from pynescript.ast.error import SyntaxErrorDetails
+
+
+if TYPE_CHECKING:
+    from antlr4.Recognizer import Recognizer
 
 
 class PinescriptErrorListener(ErrorListener):
@@ -49,21 +54,18 @@ class PinescriptErrorListener(ErrorListener):
             input_stream = recognizer._input
             if isinstance(input_stream, FileStream):
                 return input_stream.fileName
-            elif isinstance(input_stream, InputStream):
+            if isinstance(input_stream, InputStream):
                 if hasattr(input_stream, "getSourceName"):
                     return input_stream.getSourceName()
-                elif hasattr(input_stream, "sourceName"):
+                if hasattr(input_stream, "sourceName"):
                     return input_stream.sourceName
-                elif input_stream.name:
+                if input_stream.name:
                     return input_stream.name
-                else:
-                    return "<unknown>"
-            else:
-                msg = f"unexpected type of input: {type(input_stream)}"
-                raise TypeError(msg)
-        else:
-            msg = f"unexpected type of recognizer: {type(recognizer)}"
+                return "<unknown>"
+            msg = f"unexpected type of input: {type(input_stream)}"
             raise TypeError(msg)
+        msg = f"unexpected type of recognizer: {type(recognizer)}"
+        raise TypeError(msg)
 
     _LINE_PATTERN = re.compile(r"(.*?(?:\r\n|\n|\r|$))")
 
@@ -92,14 +94,12 @@ class PinescriptErrorListener(ErrorListener):
                     lines = self._splitLines(source, maxlines=lineno)
                     source = lines[lineno - 1]
                 return source
-            else:
-                msg = f"unexpected type of input: {type(input_stream)}"
-                raise TypeError(msg)
-        else:
-            msg = f"unexpected type of recognizer: {type(recognizer)}"
+            msg = f"unexpected type of input: {type(input_stream)}"
             raise TypeError(msg)
+        msg = f"unexpected type of recognizer: {type(recognizer)}"
+        raise TypeError(msg)
 
-    def syntaxError(  # noqa: PLR0913
+    def syntaxError(
         self,
         recognizer: Recognizer,
         offendingSymbol: Token,  # noqa: N803

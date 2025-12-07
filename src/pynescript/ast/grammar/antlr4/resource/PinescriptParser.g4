@@ -1,14 +1,14 @@
-// Copyright 2024 Yunseong Hwang
-// 
+// Copyright 2025 Yunseong Hwang
+//
 // Licensed under the GNU Lesser General Public License Version 3.0 (the "License"); you may not use this file except in
 // compliance with the License. You may obtain a copy of the License at
-// 
+//
 // https://www.gnu.org/licenses/lgpl-3.0.en.html
-// 
+//
 // Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
 // an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
 // specific language governing permissions and limitations under the License.
-// 
+//
 // SPDX-License-Identifier: LGPL-3.0-or-later
 
 parser grammar PinescriptParser;
@@ -22,10 +22,11 @@ options {
 
 start: start_script;
 
-start_script:     statements? EOF;
-start_expression: expression NEWLINE? EOF;
+start_script:          statements? EOF;
+start_expression:      expression NEWLINE? EOF;
 
-start_comments: comments? EOF;
+start_comments:        comments? EOF;
+start_type_annotation: type_annotation EOF;
 
 // STATEMENTS
 
@@ -38,6 +39,7 @@ compound_statement
     : compound_assignment
     | function_declaration
     | type_declaration
+    | enum_declaration
     | structure_statement;
 
 // SIMPLE STATEMENTS
@@ -82,6 +84,13 @@ type_declaration: EXPORT? TYPE name NEWLINE INDENT field_definitions DEDENT;
 
 field_definitions: field_definition+;
 field_definition:  type_specification name_store (EQUAL expression)? NEWLINE;
+
+// ENUM DECLARATION
+
+enum_declaration: EXPORT? ENUM name NEWLINE INDENT enum_field_definitions DEDENT;
+
+enum_field_definitions: enum_field_definition+;
+enum_field_definition: name_store (EQUAL expression)? NEWLINE;
 
 // STRUCTURES
 
@@ -292,7 +301,7 @@ type_argument_list: type_specification (COMMA type_specification)* COMMA?;
 
 // NAME WITH SOFT KEYWORDS
 
-name: NAME | TYPE | METHOD | CONST | INPUT | SIMPLE | SERIES;
+name: NAME | TYPE | METHOD | CONST | INPUT | SIMPLE | SERIES | ENUM;
 
 name_load:  name;
 name_store: name;
@@ -301,3 +310,21 @@ name_store: name;
 
 comments: comment+;
 comment:  COMMENT;
+
+// TYPE ANNOTATION EXTENSION
+
+type_annotation: type_qualifier? type_union;
+
+type_union:
+	type_specification_extension (
+		SLASH type_specification_extension
+	)*;
+
+type_specification_extension:
+	attributed_type_name template_spec_suffix_extension? array_type_suffix?;
+
+template_spec_suffix_extension:
+	LESS type_argument_list_extension? GREATER;
+
+type_argument_list_extension:
+	type_union (COMMA type_union)* COMMA?;

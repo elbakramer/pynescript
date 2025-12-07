@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,12 +19,16 @@ from __future__ import annotations
 import re
 
 from ast import literal_eval
-
-from antlr4 import ParserRuleContext
+from typing import TYPE_CHECKING
 
 from pynescript.ast import node as ast
-from pynescript.ast.grammar.antlr4.parser import PinescriptParser
 from pynescript.ast.grammar.antlr4.visitor import PinescriptParserVisitor
+
+
+if TYPE_CHECKING:
+    from antlr4 import ParserRuleContext
+
+    from pynescript.ast.grammar.antlr4.parser import PinescriptParser
 
 
 class PinescriptASTLocator:
@@ -58,12 +62,12 @@ class PinescriptCommentParser:
 
     _ASSIGNMENT_ANNOTATION_PATTERN = re.compile(r"^(//)(\s*)(@)(\s*)(version)(\s*)(=)(\s*)(.+)$")
     _SIMPLE_ANNOTATION_PATTERN = re.compile(
-        r"^(//)(\s*)(@)(\s*)(description|fuction|returns|type|variable|strategy_alert_message)(\s+)(.+)$"
+        r"^(//)(\s*)(@)(\s*)(description|function|returns|type|variable|strategy_alert_message)(\s+)(.+)$"
     )
     _NAMED_ANNOTATION_PATTERN = re.compile(r"^(//)(\s*)(@)(\s*)(param|field)(\s+)(\w+)(\s+)(.+)$")
     _REGION_BORDER_PATTERN = re.compile(r"^(//)(\s*)(#)(\s*)(region|endregion)$")
 
-    def _parseComment(self, comment: str):  # noqa: C901
+    def _parseComment(self, comment: str):
         m = self._ASSIGNMENT_ANNOTATION_PATTERN.match(comment)
         if m:
             kind = "@="
@@ -81,7 +85,7 @@ class PinescriptCommentParser:
                 kind += "F"
             elif parts[0] in {"type"}:
                 kind += "T"
-            elif parts[0] in {"varaible"}:
+            elif parts[0] in {"variable"}:
                 kind += "V"
             return kind, parts
         m = self._NAMED_ANNOTATION_PATTERN.match(comment)
@@ -110,12 +114,35 @@ class PinescriptASTBuilder(
 ):
     # ruff: noqa: N802
 
+    def _parseNumberLiteral(self, s: str):
+        s = s.strip().lower()
+        if "j" in s:
+            try:
+                return complex(s)
+            except ValueError as e:
+                msg = f"Invalid complex literal: {s}"
+                raise ValueError(msg) from e
+        if "." in s or "e" in s:
+            try:
+                return float(s)
+            except ValueError as e:
+                msg = f"Invalid float literal: {s}"
+                raise ValueError(msg) from e
+        if re.fullmatch(r"[-+]?\d+", s):
+            try:
+                return int(s, 10)
+            except ValueError as e:
+                msg = f"Invalid int literal: {s}"
+                raise ValueError(msg) from e
+        msg = f"Invalid numeric literal: {s}"
+        raise ValueError(msg)
+
     def visitStart(self, ctx: PinescriptParser.StartContext):
         return self.visitChildren(ctx)
 
     def visitStart_script(self, ctx: PinescriptParser.Start_scriptContext):
         stmts = ctx.statements()
-        body = stmts and self.visit(stmts) or []
+        body = self.visit(stmts) if stmts else []
         script = ast.Script(body)
         return script
 
@@ -124,6 +151,11 @@ class PinescriptASTBuilder(
         body = self.visit(expr)
         expr = ast.Expression(body)
         return expr
+
+    def visitStart_type_annotation(self, ctx: PinescriptParser.Start_type_annotationContext):
+        typ = ctx.type_annotation()
+        typ = self.visit(typ)
+        return typ
 
     def visitStatements(self, ctx: PinescriptParser.StatementsContext):
         stmts = ctx.statement()
@@ -315,7 +347,7 @@ class PinescriptASTBuilder(
         args = ctx.parameter_list()
         body = ctx.local_block()
         name = self.visit(name)
-        args = args and self.visit(args) or []
+        args = self.visit(args) if args else []
         body = self.visit(body)
         method = ctx.METHOD()
         export = ctx.EXPORT()
@@ -386,6 +418,38 @@ class PinescriptASTBuilder(
         self._setLocations(stmt, ctx)
         return stmt
 
+    def visitEnum_declaration(self, ctx: PinescriptParser.Enum_declarationContext):
+        name = ctx.name()
+        body = ctx.enum_field_definitions()
+        export = ctx.EXPORT()
+        name = self.visit(name)
+        body = self.visit(body)
+        export = 1 if export else 0
+        enum_def = ast.EnumDef(
+            name=name,
+            body=body,
+            export=export,
+        )
+        self._setLocations(enum_def, ctx)
+        return enum_def
+
+    def visitEnum_field_definitions(self, ctx: PinescriptParser.Enum_field_definitionsContext):
+        defs = ctx.enum_field_definition()
+        defs = [self.visit(d) for d in defs]
+        return defs
+
+    def visitEnum_field_definition(self, ctx: PinescriptParser.Enum_field_definitionContext):
+        target = ctx.name_store()
+        target = self.visit(target)
+        value = ctx.expression()
+        value = value and self.visit(value)
+        stmt = ast.Assign(
+            target=target,
+            value=value,
+        )
+        self._setLocations(stmt, ctx)
+        return stmt
+
     def visitStructure_statement(self, ctx: PinescriptParser.Structure_statementContext):
         struct = ctx.structure()
         struct = self.visit(struct)
@@ -421,7 +485,7 @@ class PinescriptASTBuilder(
         orelse = ctx.else_block()
         test = self.visit(test)
         body = self.visit(body)
-        orelse = orelse and self.visit(orelse) or []
+        orelse = self.visit(orelse) if orelse else []
         if_struct = ast.If(
             test=test,
             body=body,
@@ -453,7 +517,7 @@ class PinescriptASTBuilder(
         orelse = ctx.else_block()
         test = self.visit(test)
         body = self.visit(body)
-        orelse = orelse and self.visit(orelse) or []
+        orelse = self.visit(orelse) if orelse else []
         elif_struct = ast.If(
             test=test,
             body=body,
@@ -677,8 +741,7 @@ class PinescriptASTBuilder(
             )
             self._setLocations(expr, ctx)
             return expr
-        else:
-            return self.visit(ctx.multiplicative_expression())
+        return self.visit(ctx.multiplicative_expression())
 
     def visitMultiplicative_op(self, ctx: PinescriptParser.Multiplicative_opContext):
         if ctx.STAR():
@@ -703,8 +766,7 @@ class PinescriptASTBuilder(
             )
             self._setLocations(expr, ctx)
             return expr
-        else:
-            return self.visit(ctx.unary_expression())
+        return self.visit(ctx.unary_expression())
 
     def visitUnary_op(self, ctx: PinescriptParser.Unary_opContext):
         if ctx.NOT():
@@ -726,8 +788,7 @@ class PinescriptASTBuilder(
             )
             self._setLocations(expr, ctx)
             return expr
-        else:
-            return self.visit(ctx.primary_expression())
+        return self.visit(ctx.primary_expression())
 
     def visitPrimary_expression_subscript(self, ctx: PinescriptParser.Primary_expression_subscriptContext):
         value = ctx.primary_expression()
@@ -757,7 +818,7 @@ class PinescriptASTBuilder(
                 end_lineno=spec_args.end_lineno,
                 end_col_offset=spec_args.end_col_offset,
             )
-        args = args and self.visit(args) or []
+        args = self.visit(args) if args else []
         expr = ast.Call(
             func=func,
             args=args,
@@ -823,7 +884,10 @@ class PinescriptASTBuilder(
 
     def visitLiteral_number(self, ctx: PinescriptParser.Literal_numberContext):
         text = ctx.getText()
-        number = literal_eval(text)
+        try:
+            number = literal_eval(text)
+        except SyntaxError:
+            number = self._parseNumberLiteral(text)
         return number
 
     def visitLiteral_string(self, ctx: PinescriptParser.Literal_stringContext):
@@ -1016,3 +1080,75 @@ class PinescriptASTBuilder(
         )
         self._setLocations(comment, ctx)
         return comment
+
+    def visitType_annotation(self, ctx: PinescriptParser.Type_annotationContext):
+        type_qual = ctx.type_qualifier()
+        type_union = ctx.type_union()
+        type_annot = self.visit(type_union)
+        if type_qual:
+            qualifier = self.visit(type_qual)
+            new_type_annot = ast.Qualify(
+                qualifier=qualifier,
+                value=type_annot,
+            )
+            self._setLocations(new_type_annot, type_qual)
+            new_type_annot.end_lineno = type_annot.end_lineno
+            new_type_annot.end_col_offset = type_annot.end_col_offset
+            type_annot = new_type_annot
+        return type_annot
+
+    def visitType_union(self, ctx: PinescriptParser.Type_unionContext):
+        args = ctx.type_specification_extension()
+        args = [self.visit(arg) for arg in args]
+        if len(args) == 1:
+            args = args[0]
+        else:
+            args = ast.BoolOp(
+                op=ast.Or(),
+                values=args,
+            )
+            self._setLocations(args, ctx)
+        return args
+
+    def visitType_specification_extension(self, ctx: PinescriptParser.Type_specification_extensionContext):
+        ident = ctx.attributed_type_name()
+        temp_spec = ctx.template_spec_suffix_extension()
+        array_suffix = ctx.array_type_suffix()
+        type_spec = self.visit(ident)
+        if temp_spec:
+            args = self.visit(temp_spec)
+            new_type_spec = ast.Specialize(
+                value=type_spec,
+                args=args,
+            )
+            self._setLocations(new_type_spec, temp_spec)
+            new_type_spec.lineno = type_spec.lineno
+            new_type_spec.col_offset = type_spec.col_offset
+            type_spec = new_type_spec
+        if array_suffix:
+            new_type_spec = ast.Subscript(
+                value=type_spec,
+            )
+            self._setLocations(new_type_spec, array_suffix)
+            new_type_spec.lineno = type_spec.lineno
+            new_type_spec.col_offset = type_spec.col_offset
+            type_spec = new_type_spec
+        return type_spec
+
+    def visitTemplate_spec_suffix_extension(self, ctx: PinescriptParser.Template_spec_suffix_extensionContext):
+        args = ctx.type_argument_list_extension()
+        args = args and self.visit(args)
+        return args
+
+    def visitType_argument_list_extension(self, ctx: PinescriptParser.Type_argument_list_extensionContext):
+        args = ctx.type_union()
+        args = [self.visit(arg) for arg in args]
+        if len(args) == 1:
+            args = args[0]
+        else:
+            args = ast.Tuple(
+                elts=args,
+                ctx=ast.Load(),
+            )
+            self._setLocations(args, ctx)
+        return args

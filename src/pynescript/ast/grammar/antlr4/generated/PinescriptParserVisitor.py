@@ -1,4 +1,4 @@
-# Generated from C:/git/pynescript/src/pynescript/ast/grammar/antlr4/resource/PinescriptParser.g4 by ANTLR 4.13.1
+# Generated from C:/Git/pynescript/src/pynescript/ast/grammar/antlr4/resource/PinescriptParser.g4 by ANTLR 4.13.2
 from antlr4 import *
 if "." in __name__:
     from .PinescriptParser import PinescriptParser
@@ -26,6 +26,11 @@ class PinescriptParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by PinescriptParser#start_comments.
     def visitStart_comments(self, ctx:PinescriptParser.Start_commentsContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#start_type_annotation.
+    def visitStart_type_annotation(self, ctx:PinescriptParser.Start_type_annotationContext):
         return self.visitChildren(ctx)
 
 
@@ -111,6 +116,21 @@ class PinescriptParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by PinescriptParser#field_definition.
     def visitField_definition(self, ctx:PinescriptParser.Field_definitionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#enum_declaration.
+    def visitEnum_declaration(self, ctx:PinescriptParser.Enum_declarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#enum_field_definitions.
+    def visitEnum_field_definitions(self, ctx:PinescriptParser.Enum_field_definitionsContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#enum_field_definition.
+    def visitEnum_field_definition(self, ctx:PinescriptParser.Enum_field_definitionContext):
         return self.visitChildren(ctx)
 
 
@@ -571,6 +591,31 @@ class PinescriptParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by PinescriptParser#comment.
     def visitComment(self, ctx:PinescriptParser.CommentContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#type_annotation.
+    def visitType_annotation(self, ctx:PinescriptParser.Type_annotationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#type_union.
+    def visitType_union(self, ctx:PinescriptParser.Type_unionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#type_specification_extension.
+    def visitType_specification_extension(self, ctx:PinescriptParser.Type_specification_extensionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#template_spec_suffix_extension.
+    def visitTemplate_spec_suffix_extension(self, ctx:PinescriptParser.Template_spec_suffix_extensionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by PinescriptParser#type_argument_list_extension.
+    def visitType_argument_list_extension(self, ctx:PinescriptParser.Type_argument_list_extensionContext):
         return self.visitChildren(ctx)
 
 

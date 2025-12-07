@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,12 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
-from pytest import Metafunc
-from pytest import Parser
+
+if TYPE_CHECKING:
+    from pytest import Metafunc
+    from pytest import Parser
 
 
 tests_dir = Path(__file__).parent

@@ -10,12 +10,8 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = "LGPL-3.0-or-later"
 keywords = ["python", "tradingview", "pinescript"]
-authors = [
-  { name = "Yunseong Hwang", email = "kika1492@gmail.com" },
-]
-maintainers = [
-  { name = "Yunseong Hwang", email = "kika1492@gmail.com" },
-]
+authors = [{ name = "Yunseong Hwang", email = "kika1492@gmail.com" }]
+maintainers = [{ name = "Yunseong Hwang", email = "kika1492@gmail.com" }]
 classifiers = [
   "Development Status :: 2 - Pre-Alpha",
   "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)",
@@ -24,10 +20,7 @@ classifiers = [
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
 ]
-dependencies = [
-  "antlr4-python3-runtime>=4.13.1",
-  "click>=8.1.7",
-]
+dependencies = ["antlr4-python3-runtime>=4.13.2", "click>=8.3.1"]
 
 [project.urls]
 Documentation = "https://github.com/elbakramer/pynescript#readme"
@@ -43,54 +36,48 @@ pinescript = "pynescript.ext.pygments.lexers:PinescriptLexer"
 [tool.hatch.version]
 path = "src/pynescript/__about__.py"
 
+[tool.hatch.envs.dev]
+dependencies = ["antlr4-tools>=0.2.2", "pyasdl>=22.1.23"]
+
+[tool.hatch.envs.dev.scripts]
+gen-antlr4 = ["python src/pynescript/ast/grammar/antlr4/tool/generate.py"]
+gen-pyasdl = ["python src/pynescript/ast/grammar/asdl/tool/generate.py"]
+
 [tool.hatch.envs.test]
 dependencies = [
-  "coverage[toml]>=7.4.2",
-  "pytest>=8.0.1",
-  "pytest-cov>=4.1.0",
-  "pytest-xdist>=3.5.0",
+  "pytest>=8.4.1",
+  "pytest-cov>=6.2.1",
+  "pytest-asyncio>=1.1.0",
+  "coverage[toml]>=7.10.1",
 ]
+
 [tool.hatch.envs.test.scripts]
-test = [
-  "pytest -n auto -d {args:tests}",
-]
-test-cov = [
-  "pytest -n auto -d --cov=src/pynescript --cov=tests --cov-report=term --cov-report=lcov {args:tests}",
-]
-coverage = [
-  "coverage run -m pytest {args:tests}",
-  "coverage combine",
-  "coverage lcov",
-  "coverage report",
-]
+test = "pytest {args:tests}"
+test-cov = "coverage run -m pytest {args:tests}"
+cov-report = ["coverage combine", "coverage xml", "coverage report"]
+cov = ["test-cov", "cov-report"]
 
 [[tool.hatch.envs.test.matrix]]
 python = ["3.10", "3.11", "3.12"]
 
+[tool.hatch.envs.default]
+dependencies = ["reuse>=6.2.0", "bump-my-version>=1.2.4"]
+
+[tool.hatch.envs.default.scripts]
+bump-version = "bump-my-version bump {args:patch}"
+add-license = 'reuse annotate --template copyright --copyright "Yunseong Hwang" --license LGPL-3.0-or-later --year 2025 --recursive --skip-unrecognised {args:src}'
+
 [tool.hatch.envs.lint]
+dependencies = ["ruff>=0.14.8", "mypy>=1.19.0", "reuse>=6.2.0"]
 detached = true
-dependencies = [
-  "black>=24.2.0",
-  "mypy>=1.8.0",
-  "ruff>=0.2.2",
-]
+
 [tool.hatch.envs.lint.scripts]
-typing = [
-  "mypy --install-types --non-interactive {args:src/pynescript tests}",
-]
-style = [
-  "ruff {args:.}",
-  "black --check --diff {args:.}",
-]
-format = [
-  "black {args:.}",
-  "ruff --fix {args:.}",
-  "style",
-]
-all = [
-  "style",
-  "typing",
-]
+check = "ruff check {args:.}"
+check-fix = "ruff check --fix {args:.}"
+format = "ruff format {args:.}"
+typing = "mypy --install-types --non-interactive {args:src/python/axserve tests}"
+license = "reuse lint"
+all = ["check-fix", "format", "typing", "license"]
 
 [tool.hatch.envs.docs]
 detached = true
@@ -104,14 +91,7 @@ dependencies = [
 ]
 
 [tool.hatch.envs.docs.scripts]
-build = [
-  "sphinx-build docs docs/_build",
-]
-
-[tool.black]
-target-version = ["py310"]
-line-length = 120
-skip-string-normalization = true
+build = ["sphinx-build docs docs/_build"]
 
 [tool.ruff]
 target-version = "py310"
@@ -119,35 +99,21 @@ line-length = 120
 extend-exclude = ["generated"]
 
 [tool.ruff.lint]
-select = [
-  "A",
-  "ARG",
-  "B",
-  "C",
-  "DTZ",
-  "E",
-  "EM",
-  "F",
-  "FBT",
-  "I",
-  "ICN",
-  "ISC",
-  "N",
-  "PLC",
-  "PLE",
-  "PLR",
-  "PLW",
-  "Q",
-  "RUF",
-  "S",
-  "T",
-  "TID",
-  "UP",
-  "W",
-  "YTT",
-]
+select = ["ALL"]
 ignore = [
-  "ISC001",
+  "D1",
+  "PTH123",
+  "ANN",
+  "C90",
+  "PLR09",
+  "F403",
+  "TID252",
+  "COM",
+  "SLF001",
+  "TRY201",
+  "RET504",
+  "PGH003",
+  "TC006",
 ]
 
 [tool.ruff.lint.isort]
@@ -157,6 +123,9 @@ lines-between-types = 1
 lines-after-imports = 2
 required-imports = ["from __future__ import annotations"]
 
+[tool.ruff.lint.pep8-naming]
+extend-ignore-names = ["id"]
+
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["PLR2004", "S101", "TID252"]
 
@@ -164,17 +133,16 @@ required-imports = ["from __future__ import annotations"]
 source_pkgs = ["pynescript", "tests"]
 branch = true
 parallel = true
-omit = [
-  "src/pynescript/__about__.py",
-]
+omit = ["src/pynescript/__about__.py"]
 
 [tool.coverage.paths]
 pynescript = ["src/pynescript", "*/pynescript/src/pynescript"]
 tests = ["tests", "*/pynescript/tests"]
 
 [tool.coverage.report]
-exclude_lines = [
-  "no cov",
-  "if __name__ == .__main__.:",
-  "if TYPE_CHECKING:",
-]
+exclude_lines = ["no cov", "if __name__ == .__main__.:", "if TYPE_CHECKING:"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"

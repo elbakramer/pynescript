@@ -79,6 +79,16 @@ class TypeDef(stmt):
 
 
 @_dataclasses.dataclass
+class EnumDef(stmt):
+    name: identifier = _dataclasses.field(default=None)
+    body: _builtins.list[stmt] = _dataclasses.field(default_factory=_builtins.list)
+    export: int | None = _dataclasses.field(default=None)
+    annotations: _builtins.list[string] = _dataclasses.field(default_factory=_builtins.list)
+    _fields: _typing.ClassVar[_builtins.list[_builtins.str]] = ["name", "body", "export", "annotations"]
+    __hash__ = _builtins.object.__hash__
+
+
+@_dataclasses.dataclass
 class Assign(stmt):
     target: expr = _dataclasses.field(default=None)
     value: expr | None = _dataclasses.field(default=None)
@@ -562,6 +572,7 @@ __all__ = [
     "stmt",
     "FunctionDef",
     "TypeDef",
+    "EnumDef",
     "Assign",
     "ReAssign",
     "AugAssign",

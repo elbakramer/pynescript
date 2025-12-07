@@ -1,4 +1,4 @@
-# Copyright 2024 Yunseong Hwang
+# Copyright 2025 Yunseong Hwang
 #
 # Licensed under the GNU Lesser General Public License Version 3.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ class NodeLiteralEvaluator(NodeVisitor):
     def visit_Conditional(self, node: ast.Conditional):
         return self.visit(node.body) if self.visit(node.test) else self.visit(node.orelse)
 
-    def visit_Compare(self, node: ast.Compare):  # noqa: C901, PLR0911, PLR0912
+    def visit_Compare(self, node: ast.Compare):
         left = self.visit(node.left)
         comparators = map(self.visit, itertools.chain([node.left], node.comparators))
         comparator_pairs = itertools.pairwise(comparators)

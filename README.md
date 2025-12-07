@@ -6,8 +6,6 @@
 [![License](https://img.shields.io/pypi/l/pynescript)][license]
 
 [![Read the documentation at https://pynescript.readthedocs.io/](https://img.shields.io/readthedocs/pynescript/latest.svg?label=Read%20the%20Docs)][read the docs]
-[![Tests](https://github.com/elbakramer/pynescript/workflows/Tests/badge.svg)][tests]
-[![Codecov](https://codecov.io/gh/elbakramer/pynescript/branch/main/graph/badge.svg)][codecov]
 
 [pypi_]: https://pypi.org/project/pynescript/
 [status]: https://pypi.org/project/pynescript/
