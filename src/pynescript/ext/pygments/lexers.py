@@ -42,6 +42,7 @@ class PinescriptLexer(Lexer):
         PinescriptANTLR4Lexer.CONST: Token.Keyword,
         PinescriptANTLR4Lexer.CONTINUE: Token.Keyword,
         PinescriptANTLR4Lexer.ELSE: Token.Keyword,
+        PinescriptANTLR4Lexer.ENUM: Token.Keyword,
         PinescriptANTLR4Lexer.EXPORT: Token.Keyword,
         PinescriptANTLR4Lexer.FALSE: Token.Literal,
         PinescriptANTLR4Lexer.FOR: Token.Keyword,
